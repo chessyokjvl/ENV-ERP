@@ -3,319 +3,199 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hospital ERP - ระบบบริหารจัดการหลังบ้าน</title>
+    <title>JVL ERP - บริหารจัดการพลังงาน</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f4f6f9; }
-        .sidebar { background-color: #2c3e50; min-height: 100vh; color: white; padding-top: 20px; }
-        .sidebar a { color: #cbd5e1; text-decoration: none; padding: 10px 20px; display: block; transition: 0.3s; }
-        .sidebar a:hover, .sidebar a.active { background-color: #34495e; color: white; border-left: 4px solid #3498db; }
-        .main-content { padding: 20px; }
-        .card-stat { border-left: 4px solid #3498db; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        .border-green { border-left-color: #2ecc71; }
-        .border-red { border-left-color: #e74c3c; }
-        #app-container { display: none; } /* ซ่อนแอปไว้จนกว่าจะ Login */
-        .login-container { height: 100vh; display: flex; align-items: center; justify-content: center; background-color: #ecf0f1; }
+        body { font-family: 'Sarabun', sans-serif; background-color: #f8f9fa; }
+        .nav-sidebar { background: #212529; min-height: 100vh; color: white; }
+        .nav-sidebar a { color: #adb5bd; text-decoration: none; padding: 15px; display: block; }
+        .nav-sidebar a.active { background: #0d6efd; color: white; }
+        .card { border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
+        #login-page { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; display: flex; align-items: center; justify-content: center; }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div id="login-page" class="login-container">
-        <div class="card p-5 shadow" style="width: 400px; border-radius: 15px;">
-            <div class="text-center mb-4">
-                <i class="fas fa-hospital fa-3x text-primary mb-3"></i>
-                <h4>เข้าสู่ระบบ JVL ERP</h4>
-                <p class="text-muted">ระบบบริหารจัดการกลุ่มภารกิจอำนวยการ</p>
-            </div>
-            <form id="loginForm" onsubmit="handleLogin(event)">
-                <div class="mb-3">
-                    <label class="form-label">ชื่อผู้ใช้งาน</label>
-                    <input type="text" class="form-control" id="username" required>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">รหัสผ่าน</label>
-                    <input type="password" class="form-control" id="password" required>
-                </div>
-                <button type="submit" class="btn btn-primary w-100">เข้าสู่ระบบ</button>
-            </form>
-        </div>
+<div id="login-page">
+    <div class="card p-4 shadow-lg" style="width: 350px;">
+        <h4 class="text-center mb-4">JVL ERP Login</h4>
+        <input type="text" id="user" class="form-control mb-3" placeholder="ชื่อผู้ใช้งาน">
+        <input type="password" id="pass" class="form-control mb-3" placeholder="รหัสผ่าน">
+        <button onclick="login()" class="btn btn-primary w-100">เข้าสู่ระบบ</button>
     </div>
+</div>
 
-    <div id="app-container" class="container-fluid">
-        <div class="row">
-            <div class="col-md-2 sidebar d-none d-md-block">
-                <h5 class="text-center mb-4"><i class="fas fa-hospital-user"></i> JVL ERP</h5>
-                <a href="#" onclick="showPage('dashboard')" id="nav-dashboard" class="active"><i class="fas fa-tachometer-alt me-2"></i> ภาพรวม (Dashboard)</a>
-                <a href="#" onclick="showPage('form-electric')" id="nav-form-electric"><i class="fas fa-bolt me-2"></i> บันทึกค่าไฟฟ้า</a>
-                <a href="#" onclick="showPage('form-water')" id="nav-form-water"><i class="fas fa-tint me-2"></i> บันทึกค่าน้ำประปา</a>
-                <a href="#" onclick="showPage('form-waste')" id="nav-form-waste"><i class="fas fa-trash-alt me-2"></i> บันทึกข้อมูลขยะ</a>
-                <hr style="border-color: #7f8c8d;">
-                <a href="#" onclick="logout()" class="text-danger"><i class="fas fa-sign-out-alt me-2"></i> ออกจากระบบ</a>
+<div id="main-app" style="display:none;" class="container-fluid">
+    <div class="row">
+        <div class="col-md-2 p-0 nav-sidebar d-none d-md-block">
+            <div class="p-3 text-center"><h5>ระบบบริหารส่วนกลาง</h5></div>
+            <a href="#" onclick="switchTab('input')" id="tab-input" class="active"><i class="fas fa-edit me-2"></i> บันทึกข้อมูล</a>
+            <a href="#" onclick="switchTab('report')" id="tab-report"><i class="fas fa-chart-bar me-2"></i> รายงาน/แก้ไขข้อมูล</a>
+            <a href="#" onclick="location.reload()" class="text-danger mt-5"><i class="fas fa-sign-out-alt me-2"></i> ออกจากระบบ</a>
+        </div>
+        
+        <div class="col-md-10 p-4">
+            <div id="view-input">
+                <h3 class="mb-4">บันทึกข้อมูลประจำเดือน</h3>
+                <div class="row">
+                    <div class="col-md-7">
+                        <div class="card p-4 mb-4">
+                            <h5><i class="fas fa-bolt text-warning me-2"></i> บันทึกค่าไฟฟ้า (แยกโซน)</h5>
+                            <form id="elecForm" onsubmit="saveElec(event)">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label>ประจำเดือน</label>
+                                        <select name="month" class="form-select" required></select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label>ปี พ.ศ.</label>
+                                        <select name="year" class="form-select" required></select>
+                                    </div>
+                                </div>
+                                <div class="row border-top pt-3">
+                                    <div class="col-md-6">
+                                        <p class="fw-bold text-primary">โซนบ้านพัก</p>
+                                        <input type="number" step="0.01" name="h_unit" class="form-control mb-2" placeholder="หน่วยที่ใช้" required>
+                                        <input type="number" step="0.01" name="h_price" class="form-control" placeholder="ราคา (บาท)" required>
+                                    </div>
+                                    <div class="col-md-6 border-start">
+                                        <p class="fw-bold text-success">โซนบริการ/สำนักงาน</p>
+                                        <input type="number" step="0.01" name="s_unit" class="form-control mb-2" placeholder="หน่วยที่ใช้" required>
+                                        <input type="number" step="0.01" name="s_price" class="form-control" placeholder="ราคา (บาท)" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-warning mt-3 w-100">บันทึกค่าไฟทั้งหมด</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="card p-4">
+                            <h5><i class="fas fa-tint text-info me-2"></i> บันทึกค่าน้ำประปา (รวม)</h5>
+                            <form id="waterForm" onsubmit="saveWater(event)">
+                                <div class="mb-2">
+                                    <label>เดือน/ปี</label>
+                                    <div class="input-group">
+                                        <select name="month" class="form-select" id="w_month"></select>
+                                        <select name="year" class="form-select" id="w_year"></select>
+                                    </div>
+                                </div>
+                                <div class="mb-2">
+                                    <label>หน่วยรวมทั้ง รพ.</label>
+                                    <input type="number" step="0.01" name="units" class="form-control" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label>ยอดเงินรวม (บาท)</label>
+                                    <input type="number" step="0.01" name="price" class="form-control" required>
+                                </div>
+                                <button type="submit" class="btn btn-info text-white w-100">บันทึกค่าน้ำ</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <div class="col-md-10 main-content">
-                <div class="d-md-none mb-3 bg-white p-3 rounded shadow-sm d-flex justify-content-between align-items-center">
-                    <h5 class="m-0 text-primary">JVL ERP</h5>
-                    <button class="btn btn-sm btn-outline-secondary" onclick="document.querySelector('.sidebar').classList.toggle('d-none')">
-                        <i class="fas fa-bars"></i> เมนู
-                    </button>
+            <div id="view-report" style="display:none;">
+                <h3 class="mb-4">รายงานสรุปและจัดการข้อมูล</h3>
+                <div class="mb-3 d-flex gap-2">
+                    <button class="btn btn-outline-primary active" onclick="loadTable('Electricity_Logs')">ตารางค่าไฟ</button>
+                    <button class="btn btn-outline-info" onclick="loadTable('Water_Logs')">ตารางค่าน้ำ</button>
                 </div>
-
-                <div id="page-dashboard" class="page-view">
-                    <h2 class="mb-4">ภาพรวมระบบ (Overview)</h2>
-                    <div class="row mb-4">
-                        <div class="col-md-4">
-                            <div class="card card-stat p-3">
-                                <h6 class="text-muted">ค่าไฟฟ้าเดือนนี้ (โดยประมาณ)</h6>
-                                <h3 class="text-primary">145,000 <small class="text-muted fs-6">บาท</small></h3>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card card-stat border-green p-3">
-                                <h6 class="text-muted">ค่าน้ำประปาเดือนนี้</h6>
-                                <h3 class="text-success">24,500 <small class="text-muted fs-6">บาท</small></h3>
-                            </div>
-                        </div>
-                        <div class="col-md-4">
-                            <div class="card card-stat border-red p-3">
-                                <h6 class="text-muted">ปริมาณขยะติดเชื้อ</h6>
-                                <h3 class="text-danger">320 <small class="text-muted fs-6">กก.</small></h3>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-8">
-                            <div class="card p-3 shadow-sm">
-                                <h5>แนวโน้มการใช้พลังงาน (สมมติ)</h5>
-                                <canvas id="energyChart" height="100"></canvas>
-                            </div>
-                        </div>
+                <div class="card p-3">
+                    <div class="table-responsive">
+                        <table id="mainTable" class="table table-hover table-bordered w-100"></table>
                     </div>
                 </div>
-
-                <div id="page-form-electric" class="page-view" style="display: none;">
-                    <h2 class="mb-4">บันทึกข้อมูลค่าไฟฟ้า</h2>
-                    <div class="card p-4 shadow-sm" style="max-width: 600px;">
-                        <form onsubmit="submitData(event, 'Electricity_Logs', 'btn-elec')">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">วันที่จดมิเตอร์</label>
-                                    <input type="date" name="date_record" class="form-control" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">โซน</label>
-                                    <select name="zone" class="form-select" required>
-                                        <option value="โซนสำนักงาน/อาคารผู้ป่วย">โซนสำนักงาน/อาคารผู้ป่วย</option>
-                                        <option value="โซนบ้านพักเจ้าหน้าที่">โซนบ้านพักเจ้าหน้าที่</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">หน่วยที่ใช้ (Unit)</label>
-                                    <input type="number" step="0.01" name="units_used" class="form-control" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">จำนวนเงิน (บาท)</label>
-                                    <input type="number" step="0.01" name="amount_paid" class="form-control">
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">ผู้บันทึกข้อมูล</label>
-                                <input type="text" name="recorder_name" class="form-control" value="ผู้ดูแลระบบ" readonly>
-                            </div>
-                            <button type="submit" id="btn-elec" class="btn btn-primary"><i class="fas fa-save"></i> บันทึกข้อมูลค่าไฟ</button>
-                        </form>
-                    </div>
-                </div>
-
-                <div id="page-form-water" class="page-view" style="display: none;">
-                    <h2 class="mb-4">บันทึกข้อมูลค่าน้ำประปา</h2>
-                    <div class="card p-4 shadow-sm" style="max-width: 600px;">
-                        <form onsubmit="submitData(event, 'Water_Logs', 'btn-water')">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">วันที่จดมิเตอร์</label>
-                                    <input type="date" name="date_record" class="form-control" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">โซน</label>
-                                    <select name="zone" class="form-select" required>
-                                        <option value="อาคารส่วนกลาง">อาคารส่วนกลาง</option>
-                                        <option value="แฟลตพยาบาล">แฟลตพยาบาล</option>
-                                        <option value="โซนบ้านพัก">โซนบ้านพัก</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label">หน่วยที่ใช้ (ลูกบาศก์เมตร)</label>
-                                <input type="number" step="0.01" name="units_used" class="form-control" required>
-                            </div>
-                            <button type="submit" id="btn-water" class="btn btn-info text-white"><i class="fas fa-save"></i> บันทึกข้อมูลค่าน้ำ</button>
-                        </form>
-                    </div>
-                </div>
-                
-                <div id="page-form-waste" class="page-view" style="display: none;">
-                    <h2 class="mb-4">อยู่ระหว่างการพัฒนา...</h2>
-                    <p>ระบบบันทึกขยะ (Recycle, ติดเชื้อ) จะถูกเพิ่มในเร็วๆ นี้</p>
-                </div>
-
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        // *** ใส่ URL ของ Google Apps Script ของคุณที่นี่ ***
-        const API_URL = "https://script.google.com/macros/s/AKfycbzY5ToEERO8PdRD2S1KvYWQDvs1fX78Hu4Myq1tzpvJNwbA1KMh2n66Tp4fBcp6F1EvQA/exec";
+<script src="https://code.jquery.com/jquery-3.7.0.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
-        // นำโค้ดนี้ไปแทนที่ฟังก์ชัน handleLogin เดิมในหน้า HTML
-async function handleLogin(e) {
-    e.preventDefault();
-    
-    const btn = e.target.querySelector('button[type="submit"]');
-    const originalBtnText = btn.innerHTML;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
-    btn.disabled = true;
+<script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbzY5ToEERO8PdRD2S1KvYWQDvs1fX78Hu4Myq1tzpvJNwbA1KMh2n66Tp4fBcp6F1EvQA/exec";
+    let currentUser = "";
 
-    const usernameInput = document.getElementById('username').value;
-    const passwordInput = document.getElementById('password').value;
+    // ตั้งค่าเริ่มต้น
+    const months = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+    const currentYear = new Date().getFullYear() + 543;
 
-    const payload = {
-        action: "login",
-        username: usernameInput,
-        password: passwordInput
-    };
-
-    try {
-        const response = await fetch(API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify(payload)
-        });
-        
-        const result = await response.json();
-        
-        if (result.status === "success") {
-            // ซ่อนหน้า Login แสดงหน้า App
-            document.getElementById('login-page').style.display = 'none';
-            document.getElementById('app-container').style.display = 'block';
-            
-            // นำชื่อผู้ใช้ไปใส่ในฟิลด์ "ผู้บันทึกข้อมูล" ของฟอร์มทั้งหมดอัตโนมัติ
-            document.querySelectorAll('input[name="recorder_name"]').forEach(input => {
-                input.value = result.userData.name;
-            });
-            
-            alert(`ยินดีต้อนรับคุณ ${result.userData.name}`);
-            renderChart();
-        } else {
-            alert("❌ " + result.message);
-        }
-    } catch (error) {
-        console.error("Login Error:", error);
-        alert("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
-    } finally {
-        btn.innerHTML = originalBtnText;
-        btn.disabled = false;
+    function init() {
+        $('select[name="month"]').html(months.map(m => `<option value="${m}">${m}</option>`).join(''));
+        let yearOpts = "";
+        for(let y=currentYear; y>=currentYear-5; y--) yearOpts += `<option value="${y}">${y}</option>`;
+        $('select[name="year"]').html(yearOpts);
     }
-}
+    init();
 
-        function logout() {
-            document.getElementById('app-container').style.display = 'none';
-            document.getElementById('login-page').style.display = 'flex';
-            document.getElementById('loginForm').reset();
-        }
+    async function login() {
+        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', username: $('#user').val(), password: $('#pass').val() }) });
+        const data = await res.json();
+        if(data.status === "success") {
+            currentUser = data.userData.name;
+            $('#login-page').hide();
+            $('#main-app').show();
+        } else alert(data.message);
+    }
 
-        // 2. ระบบ นำทาง (Routing) สลับหน้าเว็บ
-        function showPage(pageName) {
-            // ซ่อนทุกหน้า
-            document.querySelectorAll('.page-view').forEach(page => {
-                page.style.display = 'none';
-            });
-            // เอาสีเมนูเดิมออก
-            document.querySelectorAll('.sidebar a').forEach(nav => {
-                nav.classList.remove('active');
-            });
-            
-            // แสดงหน้าที่เลือก
-            document.getElementById(`page-${pageName}`).style.display = 'block';
-            document.getElementById(`nav-${pageName}`).classList.add('active');
-        }
+    function switchTab(tab) {
+        $('.nav-sidebar a').removeClass('active');
+        $(`#tab-${tab}`).addClass('active');
+        if(tab === 'input') { $('#view-input').show(); $('#view-report').hide(); }
+        else { $('#view-input').hide(); $('#view-report').show(); loadTable('Electricity_Logs'); }
+    }
 
-        // 3. ฟังก์ชันส่งข้อมูลไปยัง Google Apps Script
-        async function submitData(e, targetSheet, buttonId) {
-            e.preventDefault();
-            
-            const form = e.target;
-            const btn = document.getElementById(buttonId);
-            const originalBtnText = btn.innerHTML;
-            
-            // เปลี่ยนสถานะปุ่ม
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
-            btn.disabled = true;
+    async function saveElec(e) {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const row = [new Date().toLocaleString('th-TH'), fd.get('month'), fd.get('year'), fd.get('h_unit'), fd.get('h_price'), fd.get('s_unit'), fd.get('s_price'), currentUser];
+        await sendData('Electricity_Logs', row);
+        e.target.reset();
+    }
 
-            // รวบรวมข้อมูลจากฟอร์ม
-            const formData = new FormData(form);
-            const dataObj = Object.fromEntries(formData.entries());
-            
-            // เพิ่ม timestamp และกำหนด Sheet เป้าหมาย
-            dataObj.timestamp = new Date().toLocaleString('th-TH');
-            
-            const payload = {
-                action: "saveData",
-                targetSheet: targetSheet,
-                rowData: dataObj
-            };
+    async function saveWater(e) {
+        e.preventDefault();
+        const fd = new FormData(e.target);
+        const row = [new Date().toLocaleString('th-TH'), fd.get('month'), fd.get('year'), fd.get('units'), fd.get('price'), currentUser];
+        await sendData('Water_Logs', row);
+        e.target.reset();
+    }
 
-            try {
-                // ส่งข้อมูล (ใช้ text/plain เพื่อเลี่ยงปัญหา CORS เบื้องต้นของ GAS)
-                const response = await fetch(API_URL, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify(payload)
-                });
-                
-                alert("✅ บันทึกข้อมูลเรียบร้อยแล้ว");
-                form.reset();
-            } catch (error) {
-                console.error("Error:", error);
-                // สาเหตุที่ใช้ catch เนื่องจากบางครั้ง GAS ส่งกลับมาสำเร็จแต่ติด CORS ในฝั่ง Browser 
-                // ข้อมูลจะเข้า Sheet ไปแล้ว แต่เบราว์เซอร์จะขึ้น Error
-                alert("ส่งคำสั่งแล้ว กรุณาตรวจสอบข้อมูลใน Google Sheet (หากข้อมูลเข้า ถือว่าสำเร็จ)");
-                form.reset();
-            } finally {
-                // คืนค่าปุ่มกลับมา
-                btn.innerHTML = originalBtnText;
-                btn.disabled = false;
-            }
-        }
+    async function sendData(sheet, row) {
+        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveData', targetSheet: sheet, rowData: row }) });
+        alert("บันทึกสำเร็จ!");
+    }
 
-        // 4. สร้างกราฟจำลอง (Chart.js)
-        function renderChart() {
-            const ctx = document.getElementById('energyChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.'],
-                    datasets: [{
-                        label: 'ค่าไฟฟ้า (สำนักงาน)',
-                        data: [120000, 125000, 130000, 145000, 0, 0],
-                        borderColor: '#3498db',
-                        tension: 0.1
-                    }, {
-                        label: 'ค่าไฟฟ้า (บ้านพัก)',
-                        data: [20000, 22000, 21000, 25000, 0, 0],
-                        borderColor: '#e74c3c',
-                        tension: 0.1
-                    }]
-                },
-                options: { responsive: true }
-            });
-        }
-    </script>
+    async function loadTable(sheetName) {
+        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getData', targetSheet: sheetName }) });
+        const json = await res.json();
+        const data = json.data;
+        const headers = data[0];
+        const rows = data.slice(1);
+
+        if ($.fn.DataTable.isDataTable('#mainTable')) $('#mainTable').DataTable().destroy();
+        $('#mainTable').empty();
+
+        $('#mainTable').DataTable({
+            data: rows,
+            columns: headers.map((h, i) => ({ title: h })),
+            dom: 'Bfrtip',
+            buttons: ['copy', 'excel', 'pdf', 'print'],
+            language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' }
+        });
+    }
+</script>
 </body>
 </html>
