@@ -96,16 +96,36 @@
                 <h4 class="mb-4 fw-bold">Dashboard แนวโน้มประจำปี <span id="dash-year"></span></h4>
                 <div class="row">
                     <div class="col-md-6 mb-4">
-                        <div class="card p-3 shadow-sm border-0"><h6 class="fw-bold"><i class="fas fa-bolt text-warning"></i> Trend ค่าไฟฟ้ารวม (บาท)</h6><canvas id="cElec" height="250"></canvas></div>
+                        <div class="card p-3 shadow-sm border-0">
+                            <h6 class="fw-bold"><i class="fas fa-bolt text-warning"></i> Trend ค่าไฟฟ้ารวม (บาท)</h6>
+                            <div style="position: relative; height: 250px; width: 100%;">
+                                <canvas id="cElec"></canvas>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6 mb-4">
-                        <div class="card p-3 shadow-sm border-0"><h6 class="fw-bold"><i class="fas fa-tint text-info"></i> Trend ค่าน้ำประปา (บาท)</h6><canvas id="cWater" height="250"></canvas></div>
+                        <div class="card p-3 shadow-sm border-0">
+                            <h6 class="fw-bold"><i class="fas fa-tint text-info"></i> Trend ค่าน้ำประปา (บาท)</h6>
+                            <div style="position: relative; height: 250px; width: 100%;">
+                                <canvas id="cWater"></canvas>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6 mb-4">
-                        <div class="card p-3 shadow-sm border-0"><h6 class="fw-bold"><i class="fas fa-recycle text-success"></i> Trend ขยะรีไซเคิล (กก.)</h6><canvas id="cRecycle" height="250"></canvas></div>
+                        <div class="card p-3 shadow-sm border-0">
+                            <h6 class="fw-bold"><i class="fas fa-recycle text-success"></i> Trend ขยะรีไซเคิล (กก.)</h6>
+                            <div style="position: relative; height: 250px; width: 100%;">
+                                <canvas id="cRecycle"></canvas>
+                            </div>
+                        </div>
                     </div>
                     <div class="col-md-6 mb-4">
-                        <div class="card p-3 shadow-sm border-0"><h6 class="fw-bold"><i class="fas fa-biohazard text-danger"></i> Trend ขยะติดเชื้อ (กก.)</h6><canvas id="cInfectious" height="250"></canvas></div>
+                        <div class="card p-3 shadow-sm border-0">
+                            <h6 class="fw-bold"><i class="fas fa-biohazard text-danger"></i> Trend ขยะติดเชื้อ (กก.)</h6>
+                            <div style="position: relative; height: 250px; width: 100%;">
+                                <canvas id="cInfectious"></canvas>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
