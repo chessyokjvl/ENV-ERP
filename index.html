@@ -173,14 +173,56 @@
         // *** ใส่ URL ของ Google Apps Script ของคุณที่นี่ ***
         const API_URL = "https://script.google.com/macros/s/AKfycbzY5ToEERO8PdRD2S1KvYWQDvs1fX78Hu4Myq1tzpvJNwbA1KMh2n66Tp4fBcp6F1EvQA/exec";
 
-        // 1. ระบบ Login แบบจำลอง
-        function handleLogin(e) {
-            e.preventDefault();
-            // อนาคตสามารถนำ Username ไปเช็คกับ Database ได้
+        // นำโค้ดนี้ไปแทนที่ฟังก์ชัน handleLogin เดิมในหน้า HTML
+async function handleLogin(e) {
+    e.preventDefault();
+    
+    const btn = e.target.querySelector('button[type="submit"]');
+    const originalBtnText = btn.innerHTML;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
+    btn.disabled = true;
+
+    const usernameInput = document.getElementById('username').value;
+    const passwordInput = document.getElementById('password').value;
+
+    const payload = {
+        action: "login",
+        username: usernameInput,
+        password: passwordInput
+    };
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === "success") {
+            // ซ่อนหน้า Login แสดงหน้า App
             document.getElementById('login-page').style.display = 'none';
             document.getElementById('app-container').style.display = 'block';
-            renderChart(); // โหลดกราฟเมื่อเข้าสู่ระบบ
+            
+            // นำชื่อผู้ใช้ไปใส่ในฟิลด์ "ผู้บันทึกข้อมูล" ของฟอร์มทั้งหมดอัตโนมัติ
+            document.querySelectorAll('input[name="recorder_name"]').forEach(input => {
+                input.value = result.userData.name;
+            });
+            
+            alert(`ยินดีต้อนรับคุณ ${result.userData.name}`);
+            renderChart();
+        } else {
+            alert("❌ " + result.message);
         }
+    } catch (error) {
+        console.error("Login Error:", error);
+        alert("เกิดข้อผิดพลาดในการเชื่อมต่อกับเซิร์ฟเวอร์");
+    } finally {
+        btn.innerHTML = originalBtnText;
+        btn.disabled = false;
+    }
+}
 
         function logout() {
             document.getElementById('app-container').style.display = 'none';
