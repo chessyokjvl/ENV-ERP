@@ -361,71 +361,79 @@
 // *** ใส่ URL ของ Google Apps Script ตรงนี้ ***
 const API_URL = "https://script.google.com/macros/s/AKfycbzY5ToEERO8PdRD2S1KvYWQDvs1fX78Hu4Myq1tzpvJNwbA1KMh2n66Tp4fBcp6F1EvQA/exec";
 
+// ==========================================
+// ฟังก์ชันแก้ปัญหา CORS (บังคับส่ง Header ทุกครั้ง)
+// ==========================================
+async function fetchAPI(payload) {
+    const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // บรรทัดนี้ที่หายไปครับ!
+        body: JSON.stringify(payload)
+    });
+    return await response.json();
+}
+
 let currentUser = ""; 
 let userRole = ""; 
 let charts = {}; 
 
 const months = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
-// เพิ่ม Array ตัวย่อเดือนแบบมาตรฐาน
 const shortMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
 
-async function hash(p) { const b = new TextEncoder().encode(p); const h = await crypto.subtle.digest('SHA-256', b); return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
-function switchTab(t) { $('.nav-sidebar a').removeClass('active'); $(`#tab-${t}`).addClass('active'); $('.view-section').hide(); $(`#view-${t}`).show(); if(t==='dashboard') loadDash(); }
-
+// 1. ฟังก์ชัน Utility 
 function init() {
-    const y = new Date().getFullYear()+543; 
-    let h = ""; 
-    for(let i=y; i>=y-5; i--) h+=`<option value="${i}">${i}</option>`;
+    const currentYear = new Date().getFullYear() + 543;
+    let yearOptions = "";
+    for(let i = currentYear; i >= currentYear - 5; i--) { yearOptions += `<option value="${i}">${i}</option>`; }
     
-    $('.year-sel').html(h); 
-    $('.month-sel').html(months.map(m=>`<option value="${m}">${m}</option>`).join(''));
+    $('.year-sel').html(yearOptions);
+    $('.month-sel').html(months.map(m => `<option value="${m}">${m}</option>`).join(''));
     
-    // ตั้งค่า Dropdown หน้า Dashboard ให้เป็นปีปัจจุบันเสมอ
-    $('#dashYearFilter').html(h);
-    $('#dashYearFilter').val(y);
-
-    setTimeout(()=>{ $('#cY2').val(y-1); $('#cY3').val(y-2); }, 100);
+    // ตั้งค่า Default หน้า Dashboard
+    $('#dashYearFilter').html(yearOptions);
+    $('#dashYearFilter').val(currentYear);
+    
+    setTimeout(() => { $('#cY2').val(currentYear - 1); $('#cY3').val(currentYear - 2); }, 200);
 }
 init();
 
-// --- (เว้นโค้ดส่วน Login / Register / Forgot Password เอาไว้เหมือนเดิม) ---
-
-
+function switchTab(tabId) {
+    $('.nav-sidebar a').removeClass('active');
+    $(`#tab-${tabId}`).addClass('active');
+    $('.view-section').hide();
+    $(`#view-${tabId}`).fadeIn(200);
+    
+    if(tabId === 'dashboard') loadDashboard();
+    if(tabId === 'report') loadTable('Electricity_Logs');
+}
 
 // 2. ระบบ Security & Login (CryptoJS)
 async function login() {
     const u = $('#user').val();
     const p = $('#pass').val();
-    
     if(!u || !p) return alert("กรุณากรอกข้อมูลให้ครบ");
     
     const btn = document.getElementById('btn-login');
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> รอสักครู่...';
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>รอสักครู่...';
     btn.disabled = true;
     
     try {
-        // ใช้ CryptoJS แปลงรหัสผ่าน (แก้ปัญหา Web Crypto API พังในไฟล์ Local)
         const hashPass = CryptoJS.SHA256(p).toString();
-        
-        const res = await fetch(API_URL, { 
-            method: 'POST', 
-            body: JSON.stringify({ action: 'login', username: u, passwordHash: hashPass }) 
-        });
-        const data = await res.json();
+        const data = await fetchAPI({ action: 'login', username: u, passwordHash: hashPass });
         
         if(data.status === 'success') {
             currentUser = data.userData.name;
             userRole = data.userData.role;
             $('#login-page').hide();
             $('#main-app').show();
-            $('#admin-menu').show(); // แอดมินเห็นเมนูกรอกข้อมูล
-            loadDashboard(); // โหลดกราฟทันที
+            $('#admin-menu').show(); 
+            loadDashboard(); // โหลดกราฟ
         } else {
             alert("❌ " + data.message);
         }
     } catch(e) {
         console.error(e);
-        alert("เชื่อมต่อเซิร์ฟเวอร์ล้มเหลว กรุณาตรวจสอบ URL");
+        alert("เชื่อมต่อเซิร์ฟเวอร์ล้มเหลว กรุณาตรวจสอบ URL หรือการเชื่อมต่ออินเทอร์เน็ต");
     } finally {
         btn.innerHTML = 'เข้าสู่ระบบ';
         btn.disabled = false;
@@ -433,43 +441,30 @@ async function login() {
 }
 
 function loginGuest() {
-    currentUser = "Guest";
-    userRole = "Guest";
+    currentUser = "Guest"; userRole = "Guest";
     $('#login-page').hide();
     $('#main-app').show();
-    $('#admin-menu').hide(); // ซ่อนเมนูกรอกข้อมูลสำหรับ Guest
+    $('#admin-menu').hide(); 
     switchTab('dashboard');
 }
 
 async function register() {
     if(!$('#pdpa').is(':checked')) return alert("กรุณายอมรับเงื่อนไข PDPA ก่อนครับ");
-    
-    const u = $('#rU').val(); const n = $('#rN').val(); 
-    const e = $('#rE').val(); const p = $('#rP').val();
-    
+    const u = $('#rU').val(); const n = $('#rN').val(); const e = $('#rE').val(); const p = $('#rP').val();
     if(!u || !n || !e || !p) return alert("กรอกข้อมูลให้ครบถ้วน");
     
     const hashPass = CryptoJS.SHA256(p).toString();
-    
     try {
-        const res = await fetch(API_URL, { 
-            method: 'POST', 
-            body: JSON.stringify({ action: 'register', username: u, name: n, email: e, passwordHash: hashPass }) 
-        });
-        const data = await res.json();
+        const data = await fetchAPI({ action: 'register', username: u, name: n, email: e, passwordHash: hashPass });
         alert(data.message);
-        if(data.status === "success") {
-            bootstrap.Modal.getInstance(document.getElementById('regModal')).hide();
-        }
+        if(data.status === "success") bootstrap.Modal.getInstance(document.getElementById('regModal')).hide();
     } catch(err) { alert("เชื่อมต่อล้มเหลว"); }
 }
 
 async function forgot() {
-    const e = $('#fE').val();
-    if(!e) return alert("กรุณากรอกอีเมล");
+    const e = $('#fE').val(); if(!e) return alert("กรุณากรอกอีเมล");
     try {
-        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'forgotPassword', email: e }) });
-        const data = await res.json();
+        const data = await fetchAPI({ action: 'forgotPassword', email: e });
         alert(data.message);
         if(data.status === "success") bootstrap.Modal.getInstance(document.getElementById('forgotModal')).hide();
     } catch(err) { alert("ส่งล้มเหลว"); }
@@ -477,347 +472,179 @@ async function forgot() {
 
 // 3. ฟังก์ชันคำนวณหน้าค่าไฟ
 function calcE() {
-    const on = parseFloat($('#eOn').val()) || 0;
-    const off = parseFloat($('#eOff').val()) || 0;
-    const hol = parseFloat($('#eHol').val()) || 0;
-    
-    // รวม On/Off/Hol ลงในช่อง T_Unit
-    if($('#eOn').val() || $('#eOff').val() || $('#eHol').val()) {
-        $('#eTU').val((on + off + hol).toFixed(2));
-    }
-    
-    const tu = parseFloat($('#eTU').val()) || 0;
-    const tp = parseFloat($('#eTP').val()) || 0;
-    const hu = parseFloat($('#eHU').val()) || 0;
-    const hp = parseFloat($('#eHP').val()) || 0;
-    
-    // หักลบบ้านพัก เพื่อเป็นยอดบริการ
-    $('#eSU').val((tu - hu).toFixed(2));
-    $('#eSP').val((tp - hp).toFixed(2));
+    const on = parseFloat($('#eOn').val()) || 0; const off = parseFloat($('#eOff').val()) || 0; const hol = parseFloat($('#eHol').val()) || 0;
+    if($('#eOn').val() || $('#eOff').val() || $('#eHol').val()) $('#eTU').val((on + off + hol).toFixed(2));
+    const tu = parseFloat($('#eTU').val()) || 0; const tp = parseFloat($('#eTP').val()) || 0;
+    const hu = parseFloat($('#eHU').val()) || 0; const hp = parseFloat($('#eHP').val()) || 0;
+    $('#eSU').val((tu - hu).toFixed(2)); $('#eSP').val((tp - hp).toFixed(2));
 }
 
 function calcModal() {
-    const on = parseFloat($('#m_onP').val()) || 0;
-    const off = parseFloat($('#m_offP').val()) || 0;
-    const hol = parseFloat($('#m_hol').val()) || 0;
-    
-    if($('#m_onP').val() || $('#m_offP').val() || $('#m_hol').val()) {
-        $('#m_tU').val((on + off + hol).toFixed(2));
-    }
-    
-    const tu = parseFloat($('#m_tU').val()) || 0;
-    const tp = parseFloat($('#m_tP').val()) || 0;
-    const hu = parseFloat($('#m_hU').val()) || 0;
-    const hp = parseFloat($('#m_hP').val()) || 0;
-    
-    $('#m_sU').val((tu - hu).toFixed(2));
-    $('#m_sP').val((tp - hp).toFixed(2));
+    const on = parseFloat($('#m_onP').val()) || 0; const off = parseFloat($('#m_offP').val()) || 0; const hol = parseFloat($('#m_hol').val()) || 0;
+    if($('#m_onP').val() || $('#m_offP').val() || $('#m_hol').val()) $('#m_tU').val((on + off + hol).toFixed(2));
+    const tu = parseFloat($('#m_tU').val()) || 0; const tp = parseFloat($('#m_tP').val()) || 0;
+    const hu = parseFloat($('#m_hU').val()) || 0; const hp = parseFloat($('#m_hP').val()) || 0;
+    $('#m_sU').val((tu - hu).toFixed(2)); $('#m_sP').val((tp - hp).toFixed(2));
 }
 
-// 4. บันทึกข้อมูลเข้า Google Sheets
+// 4. บันทึกข้อมูล
 async function saveData(e, sheet, type) {
-    e.preventDefault();
-    const fd = new FormData(e.target);
-    const btnId = `btn-save-${type}`;
-    const btn = document.getElementById(btnId);
-    
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
-    btn.disabled = true;
+    e.preventDefault(); const fd = new FormData(e.target);
+    const btn = document.getElementById(`btn-save-${type}`);
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> บันทึก...'; btn.disabled = true;
 
-    const ts = new Date().toLocaleString('th-TH');
-    const m = fd.get('month');
-    const y = fd.get('year');
-    let row = [];
+    const ts = new Date().toLocaleString('th-TH'); const m = fd.get('month'); const y = fd.get('year'); let row = [];
     
-    if(type === 'elec') {
-        row = [ts, m, y, $('#eOn').val()||"", $('#eOff').val()||"", $('#eHol').val()||"", $('#eTU').val(), $('#eTP').val(), $('#eHU').val()||"", $('#eHP').val()||"", $('#eSU').val(), $('#eSP').val(), currentUser];
-    } else if(type === 'water') {
-        row = [ts, m, y, fd.get('u'), fd.get('p'), currentUser];
-    } else if(type === 'recycle') {
-        row = [ts, m, y, fd.get('r1'), fd.get('r2'), fd.get('r3'), fd.get('r4'), fd.get('r5'), fd.get('r6'), fd.get('r7'), fd.get('r8'), fd.get('r9'), fd.get('r10'), currentUser];
-    } else if(type === 'infectious') {
-        row = [ts, m, y, fd.get('w'), currentUser];
-    }
+    if(type === 'elec') row = [ts, m, y, $('#eOn').val()||"", $('#eOff').val()||"", $('#eHol').val()||"", $('#eTU').val(), $('#eTP').val(), $('#eHU').val()||"", $('#eHP').val()||"", $('#eSU').val(), $('#eSP').val(), currentUser];
+    else if(type === 'water') row = [ts, m, y, fd.get('u'), fd.get('p'), currentUser];
+    else if(type === 'recycle') row = [ts, m, y, fd.get('r1'), fd.get('r2'), fd.get('r3'), fd.get('r4'), fd.get('r5'), fd.get('r6'), fd.get('r7'), fd.get('r8'), fd.get('r9'), fd.get('r10'), currentUser];
+    else if(type === 'infectious') row = [ts, m, y, fd.get('w'), currentUser];
 
     try {
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveData', targetSheet: sheet, rowData: row }) });
-        alert("✅ บันทึกข้อมูลสำเร็จ");
-        e.target.reset();
-        // คืนค่าเดือนปีที่เพิ่งบันทึกไป
-        $(`.month-sel`).val(m);
-        $(`.year-sel`).val(y);
-    } catch(err) {
-        alert("บันทึกข้อมูลเรียบร้อย (เครือข่ายตอบกลับล่าช้า)");
-        e.target.reset();
-    } finally {
-        btn.innerHTML = 'บันทึกข้อมูล';
-        btn.disabled = false;
-    }
+        await fetchAPI({ action: 'saveData', targetSheet: sheet, rowData: row });
+        alert("✅ บันทึกข้อมูลสำเร็จ"); e.target.reset(); $(`.month-sel`).val(m); $(`.year-sel`).val(y);
+    } catch(err) { alert("เครือข่ายขัดข้อง"); } finally { btn.innerHTML = 'บันทึกข้อมูล'; btn.disabled = false; }
 }
 
-// 5. โหลด Dashboard (Run Charts 4 แกน)
-// Dashboard & Run Charts (อัปเดตใหม่)
-async function loadDash() {
-    // 1. อ่านค่าปีจาก Dropdown (ถ้ายังไม่มีให้ใช้ปีปัจจุบัน)
+// 5. โหลด Dashboard
+async function loadDashboard() {
     const selectedYear = $('#dashYearFilter').val() || (new Date().getFullYear() + 543).toString();
-    
-    const conf = [
-        {id:'cElec', s:'Electricity_Logs', c:'#ffc107', idx:7},
-        {id:'cWater', s:'Water_Logs', c:'#0dcaf0', idx:4},
-        {id:'cRecycle', s:'Recycle_Logs', c:'#198754', idx:'sum'},
-        {id:'cInfectious', s:'Infectious_Logs', c:'#dc3545', idx:3}
+    const configs = [
+        { id: 'cElec', sheet: 'Electricity_Logs', color: '#ffc107', idx: 7 },
+        { id: 'cWater', sheet: 'Water_Logs', color: '#0dcaf0', idx: 4 },
+        { id: 'cRecycle', sheet: 'Recycle_Logs', color: '#198754', idx: 'sum' },
+        { id: 'cInfectious', sheet: 'Infectious_Logs', color: '#dc3545', idx: 3 }
     ];
-    
-    for(let f of conf) {
+
+    for(let conf of configs) {
         try {
-            const res = await fetch(API_URL, {method:'POST', body: JSON.stringify({action:'getData', targetSheet:f.s})});
-            const rows = (await res.json()).data.slice(1);
+            const json = await fetchAPI({ action: 'getData', targetSheet: conf.sheet });
+            const rows = json.data.slice(1);
             let d = new Array(12).fill(0);
             
             rows.forEach(r => {
                 const mIdx = months.indexOf(String(r[1]).trim());
-                // 2. เช็คว่าปีในฐานข้อมูล ตรงกับปีที่เลือกใน Dropdown หรือไม่
                 if(mIdx !== -1 && String(r[2]).trim() === selectedYear) {
-                    if(f.idx === 'sum') { 
-                        for(let i=3; i<=12; i++) d[mIdx] += Number(r[i]||0); 
-                    } else {
-                        d[mIdx] += Number(r[f.idx]||0);
-                    }
+                    if(conf.idx === 'sum') { for(let i=3; i<=12; i++) d[mIdx] += Number(r[i]||0); } 
+                    else { d[mIdx] += Number(r[conf.idx]||0); }
                 }
             });
-            
-            if(charts[f.id]) charts[f.id].destroy();
-            charts[f.id] = new Chart(document.getElementById(f.id), {
-                type:'line', 
-                data:{
-                    // 3. เปลี่ยนไปใช้ shortMonths (ตัวย่อมาตรฐาน)
-                    labels: shortMonths, 
-                    datasets:[{data:d, borderColor:f.c, backgroundColor:f.c+'22', fill:true, tension:0.3}]
+
+            if(charts[conf.id]) charts[conf.id].destroy();
+            charts[conf.id] = new Chart(document.getElementById(conf.id).getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: shortMonths, // ใช้ตัวย่อเดือน ม.ค. - ธ.ค.
+                    datasets: [{ data: d, borderColor: conf.color, backgroundColor: conf.color + '33', borderWidth: 2, fill: true, tension: 0.3, pointBackgroundColor: conf.color }]
                 },
-                options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
             });
-        } catch(e) { console.error(`Error loading chart ${f.id}:`, e); }
+        } catch(e) { console.error(e); }
     }
 }
 
-
-// 6. เปรียบเทียบ 3 ปี (แก้ Logic "ลดลง/เพิ่มขึ้น")
+// 6. เปรียบเทียบ 3 ปี 
 async function genComp() {
-    const t = $('#cType').val();
-    const y1 = $('#cY1').val(); const y2 = $('#cY2').val(); const y3 = $('#cY3').val();
-    const btn = $('#btn-comp');
-    
-    btn.html('<i class="fas fa-spinner fa-spin"></i> รอสักครู่').prop('disabled', true);
+    const t = $('#cType').val(); const y1 = $('#cY1').val(); const y2 = $('#cY2').val(); const y3 = $('#cY3').val();
+    const btn = $('#btn-comp'); btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
     
     try {
-        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getData', targetSheet: t }) });
-        const rows = (await res.json()).data.slice(1);
-        
+        const json = await fetchAPI({ action: 'getData', targetSheet: t });
+        const rows = json.data.slice(1);
         let d1=new Array(12).fill(0), d2=new Array(12).fill(0), d3=new Array(12).fill(0);
         let s1=0, s2=0, s3=0;
         
         rows.forEach(r => {
-            const m = months.indexOf(String(r[1]).trim()); 
-            const y = String(r[2]).trim(); 
-            if(m === -1) return;
-            
+            const m = months.indexOf(String(r[1]).trim()); const y = String(r[2]).trim(); if(m === -1) return;
             let v = 0;
             if(t === 'Electricity_Logs') v = Number(r[7]||0);
             else if(t === 'Water_Logs') v = Number(r[4]||0);
             else if(t === 'Recycle_Logs') { for(let i=3; i<=12; i++) v+=Number(r[i]||0); }
             else if(t === 'Infectious_Logs') v = Number(r[3]||0);
             
-            if(y === y1) { d1[m]+=v; s1+=v; } 
-            else if(y === y2) { d2[m]+=v; s2+=v; } 
-            else if(y === y3) { d3[m]+=v; s3+=v; }
+            if(y === y1) { d1[m]+=v; s1+=v; } else if(y === y2) { d2[m]+=v; s2+=v; } else if(y === y3) { d3[m]+=v; s3+=v; }
         });
 
-        // ----------------------------------------------------
-        // Logic ใหม่: (ปีใหม่ตั้ง - ปีเก่าฐาน)
-        // ถ้าผลเป็น + แสดงว่าใช้มากขึ้น (สีแดง)
-        // ถ้าผลเป็น - แสดงว่าใช้น้อยลง ประหยัดขึ้น (สีเขียว)
-        // ----------------------------------------------------
         const getInsight = (valNew, valOld, yearNew, yearOld) => {
-            if(valOld === 0) return `ไม่มีข้อมูลของปี ${yearOld}`;
-            
-            const diff = valNew - valOld; 
-            const pct = (diff / valOld) * 100;
-            
+            if(valOld === 0) return `ไม่มีข้อมูลปี ${yearOld}`;
+            const diff = valNew - valOld; const pct = (diff / valOld) * 100;
             const colorClass = diff > 0 ? 'text-danger' : 'text-success';
             const icon = diff > 0 ? '<i class="fas fa-arrow-up"></i> เพิ่มขึ้น' : '<i class="fas fa-arrow-down"></i> ลดลง';
-            
             return `เทียบปี <b>${yearNew}</b> กับ <b>${yearOld}</b>: <span class="${colorClass}">${icon} ${Math.abs(diff).toLocaleString(undefined, {minimumFractionDigits: 2})}</span> คิดเป็น <b>${Math.abs(pct).toFixed(2)}%</b>`;
         };
 
-        $('#comp-insight').html(`
-            <h5 class="fw-bold mb-3"><i class="fas fa-lightbulb text-warning"></i> บทวิเคราะห์ (Insights)</h5>
-            <ul>
-                <li class="mb-2">${getInsight(s2, s1, y2, y1)}</li>
-                <li class="mb-2">${getInsight(s3, s2, y3, y2)}</li>
-            </ul>
-            <div class="small text-muted mt-3 pt-2 border-top">
-                <b>สรุปยอดรวมสุทธิ:</b> ปี ${y1} = ${s1.toLocaleString()} | ปี ${y2} = ${s2.toLocaleString()} | ปี ${y3} = ${s3.toLocaleString()}
-            </div>
-        `).fadeIn();
+        $('#comp-insight').html(`<h5 class="fw-bold mb-3"><i class="fas fa-lightbulb text-warning"></i> Insights</h5><ul><li class="mb-2">${getInsight(s2, s1, y2, y1)}</li><li class="mb-2">${getInsight(s3, s2, y3, y2)}</li></ul><div class="small text-muted mt-3 pt-2 border-top"><b>ยอดรวมสุทธิ:</b> ปี ${y1} = ${s1.toLocaleString()} | ปี ${y2} = ${s2.toLocaleString()} | ปี ${y3} = ${s3.toLocaleString()}</div>`).fadeIn();
         
         $('#comp-chart-card').fadeIn();
         if(charts.comp) charts.comp.destroy();
-        
         charts.comp = new Chart(document.getElementById('compChart'), {
-            type: 'bar',
-            data: {
-                labels: months,
-                datasets: [
-                    {label: y1, data: d1, backgroundColor: '#0d6efd'},
-                    {label: y2, data: d2, backgroundColor: '#ffc107'},
-                    {label: y3, data: d3, backgroundColor: '#198754'}
-                ]
-            },
+            type: 'bar', data: { labels: shortMonths, datasets: [{label: y1, data: d1, backgroundColor: '#0d6efd'}, {label: y2, data: d2, backgroundColor: '#ffc107'}, {label: y3, data: d3, backgroundColor: '#198754'}] },
             options: { responsive: true, maintainAspectRatio: false }
         });
-
-    } catch(err) { alert("เชื่อมต่อล้มเหลว"); }
-    finally { btn.html('วิเคราะห์').prop('disabled', false); }
+    } catch(err) { alert("เชื่อมต่อล้มเหลว"); } finally { btn.html('วิเคราะห์').prop('disabled', false); }
 }
 
 // 7. TOU Analysis
 async function genTOU() {
-    const y = $('#touY').val();
-    const btn = $('#btn-tou');
-    btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
-    
+    const y = $('#touY').val(); const btn = $('#btn-tou'); btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
     try {
-        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getData', targetSheet: 'Electricity_Logs' }) });
-        const rows = (await res.json()).data.slice(1);
-        
+        const json = await fetchAPI({ action: 'getData', targetSheet: 'Electricity_Logs' });
+        const rows = json.data.slice(1);
         let sOn=0, sOff=0, sHol=0;
-        rows.forEach(r => {
-            if(String(r[2]).trim() === String(y)) { 
-                sOn += Number(r[3]||0); 
-                sOff += Number(r[4]||0); 
-                sHol += Number(r[5]||0); 
-            }
-        });
-        
+        rows.forEach(r => { if(String(r[2]).trim() === String(y)) { sOn += Number(r[3]||0); sOff += Number(r[4]||0); sHol += Number(r[5]||0); } });
         const total = sOn + sOff + sHol;
         
         $('#tou-result').fadeIn();
         if(charts.tou) charts.tou.destroy();
-        
         charts.tou = new Chart(document.getElementById('touPie'), {
-            type: 'doughnut', 
-            data: {
-                labels: ['On-Peak', 'Off-Peak', 'Holiday'], 
-                datasets: [{ data: [sOn, sOff, sHol], backgroundColor: ['#ffc107', '#6c757d', '#0dcaf0'] }]
-            },
+            type: 'doughnut', data: { labels: ['On-Peak', 'Off-Peak', 'Holiday'], datasets: [{ data: [sOn, sOff, sHol], backgroundColor: ['#ffc107', '#6c757d', '#0dcaf0'] }] },
             options: { responsive: true, maintainAspectRatio: false }
         });
 
         let txt = `<h5 class="text-primary mb-3">สรุปพฤติกรรม ปี ${y}</h5>`;
-        if(total === 0) {
-            txt += `<p class="text-danger">ไม่พบข้อมูล On/Off-Peak ในปีนี้</p>`;
-        } else {
+        if(total === 0) txt += `<p class="text-danger">ไม่พบข้อมูล TOU ในปีนี้</p>`;
+        else {
             const pOn = ((sOn/total)*100).toFixed(1);
-            txt += `
-                <p><b>ยอดรวมปริมาณไฟฟ้า:</b> ${total.toLocaleString()} หน่วย</p>
-                <ul>
-                    <li><span class="text-warning fw-bold">On-Peak:</span> ${sOn.toLocaleString()} (${pOn}%)</li>
-                    <li><span class="text-secondary fw-bold">Off-Peak:</span> ${sOff.toLocaleString()} (${((sOff/total)*100).toFixed(1)}%)</li>
-                    <li><span class="text-info fw-bold">Holiday:</span> ${sHol.toLocaleString()} (${((sHol/total)*100).toFixed(1)}%)</li>
-                </ul>
-                <div class="alert ${pOn > 40 ? 'alert-danger' : 'alert-success'} mt-3 border-0 small">
-                    <b><i class="fas fa-robot"></i> AI Suggestion:</b><br>
-                    สัดส่วนช่วง On-Peak (ค่าไฟแพง) อยู่ที่ ${pOn}% 
-                    ${pOn > 40 ? 'ซึ่งค่อนข้างสูง ควรพิจารณาย้ายเครื่องจักรหนักไปเดินเครื่องช่วง Off-Peak หรือ Holiday' : 'อยู่ในเกณฑ์บริหารจัดการพลังงานได้ดี'}
-                </div>
-            `;
+            txt += `<p><b>ปริมาณไฟฟ้า:</b> ${total.toLocaleString()} หน่วย</p><ul><li><span class="text-warning fw-bold">On-Peak:</span> ${sOn.toLocaleString()} (${pOn}%)</li><li><span class="text-secondary fw-bold">Off-Peak:</span> ${sOff.toLocaleString()} (${((sOff/total)*100).toFixed(1)}%)</li><li><span class="text-info fw-bold">Holiday:</span> ${sHol.toLocaleString()} (${((sHol/total)*100).toFixed(1)}%)</li></ul><div class="alert ${pOn > 40 ? 'alert-danger' : 'alert-success'} mt-3 border-0 small"><b><i class="fas fa-robot"></i> AI Suggestion:</b><br>สัดส่วนช่วง On-Peak อยู่ที่ ${pOn}% ${pOn > 40 ? 'ค่อนข้างสูง ควรย้ายเครื่องจักรหนักไปเดินเครื่องช่วง Off-Peak' : 'อยู่ในเกณฑ์บริหารพลังงานได้ดี'}</div>`;
         }
         $('#tou-text').html(txt);
-
-    } catch(err) { alert("ล้มเหลว"); }
-    finally { btn.html('ประมวลผล').prop('disabled', false); }
+    } catch(err) { alert("ล้มเหลว"); } finally { btn.html('ประมวลผล').prop('disabled', false); }
 }
 
 // 8. โหลดตารางและ Edit
 async function loadTable(sheet) {
-    $('#view-report .btn').removeClass('active'); 
-    event.target.classList.add('active');
-    
+    $('#view-report .btn').removeClass('active'); event.target.classList.add('active');
     $('#mainTable').html('<tr><td class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i></td></tr>');
-    
     try {
-        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getData', targetSheet: sheet }) });
-        const data = (await res.json()).data;
-        
-        if ($.fn.DataTable.isDataTable('#mainTable')) $('#mainTable').DataTable().destroy(); 
-        $('#mainTable').empty();
-        
+        const json = await fetchAPI({ action: 'getData', targetSheet: sheet });
+        const data = json.data;
+        if ($.fn.DataTable.isDataTable('#mainTable')) $('#mainTable').DataTable().destroy(); $('#mainTable').empty();
         if(!data || data.length <= 1) return $('#mainTable').html('<tr><td class="text-center">ไม่พบข้อมูล</td></tr>');
 
-        // ตัด Index ของ Backend (ตัวสุดท้าย) ออกจากการสร้างหัวตาราง
-        const headers = data[0].slice(0, -1); 
-        let colsDef = headers.map(h => ({ title: h }));
-        
-        // แอดมินสามารถแก้ไขค่าไฟได้
+        const headers = data[0].slice(0, -1); let colsDef = headers.map(h => ({ title: h }));
         if(sheet === 'Electricity_Logs' && userRole !== 'Guest') {
-            colsDef.push({ 
-                title: "จัดการ", 
-                render: function(data, type, row) {
-                    return `<button class="btn btn-sm btn-warning" onclick="openEditModal('${encodeURIComponent(JSON.stringify(row))}')"><i class="fas fa-edit"></i> เติมข้อมูล</button>`;
-                }
-            });
+            colsDef.push({ title: "จัดการ", render: function(data, type, row) { return `<button class="btn btn-sm btn-warning" onclick="openEditModal('${encodeURIComponent(JSON.stringify(row))}')"><i class="fas fa-edit"></i> เติมข้อมูล</button>`; } });
         }
-
-        $('#mainTable').DataTable({
-            data: data.slice(1), 
-            columns: colsDef, 
-            dom: 'Bfrtip', 
-            buttons: ['excel', 'print'], 
-            language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' }, 
-            order: [[0, 'desc']],
-            scrollX: true
-        });
+        $('#mainTable').DataTable({ data: data.slice(1), columns: colsDef, dom: 'Bfrtip', buttons: ['excel', 'print'], language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' }, order: [[0, 'desc']], scrollX: true });
     } catch(err) { $('#mainTable').html('<tr><td class="text-center text-danger">เกิดข้อผิดพลาด</td></tr>'); }
 }
 
 function openEditModal(encRow) {
     const r = JSON.parse(decodeURIComponent(encRow));
-    
-    // Index 13 คือ RowIndex ที่ GAS แนบมาให้
-    $('#m_idx').val(r[13]); 
-    $('#m_ts').val(r[0]); $('#m_month').val(r[1]); $('#m_year').val(r[2]);
-    $('#m_title_text').text(`ประจำเดือน ${r[1]} ${r[2]}`);
-    
-    $('#m_onP').val(r[3]); $('#m_offP').val(r[4]); $('#m_hol').val(r[5]);
-    $('#m_tU').val(r[6]); $('#m_tP').val(r[7]); 
-    $('#m_hU').val(r[8]); $('#m_hP').val(r[9]);
-    
-    calcModal(); 
-    new bootstrap.Modal(document.getElementById('editElecModal')).show();
+    $('#m_idx').val(r[13]); $('#m_ts').val(r[0]); $('#m_month').val(r[1]); $('#m_year').val(r[2]); $('#m_title_text').text(`ประจำเดือน ${r[1]} ${r[2]}`);
+    $('#m_onP').val(r[3]); $('#m_offP').val(r[4]); $('#m_hol').val(r[5]); $('#m_tU').val(r[6]); $('#m_tP').val(r[7]); $('#m_hU').val(r[8]); $('#m_hP').val(r[9]);
+    calcModal(); new bootstrap.Modal(document.getElementById('editElecModal')).show();
 }
 
 async function saveEditElec() {
     const rowIdx = $('#m_idx').val();
-    
-    const updatedRow = [
-        $('#m_ts').val(), $('#m_month').val(), $('#m_year').val(), 
-        $('#m_onP').val()||"", $('#m_offP').val()||"", $('#m_hol').val()||"", 
-        $('#m_tU').val(), $('#m_tP').val(), 
-        $('#m_hU').val()||"", $('#m_hP').val()||"", 
-        $('#m_sU').val(), $('#m_sP').val(), 
-        currentUser + " (Edit)"
-    ];
-
+    const updatedRow = [ $('#m_ts').val(), $('#m_month').val(), $('#m_year').val(), $('#m_onP').val()||"", $('#m_offP').val()||"", $('#m_hol').val()||"", $('#m_tU').val(), $('#m_tP').val(), $('#m_hU').val()||"", $('#m_hP').val()||"", $('#m_sU').val(), $('#m_sP').val(), currentUser + " (Edit)" ];
     try {
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'editData', targetSheet: 'Electricity_Logs', rowIndex: rowIdx, rowData: updatedRow }) });
-        alert('✅ บันทึกการแก้ไขเรียบร้อยแล้ว');
-        bootstrap.Modal.getInstance(document.getElementById('editElecModal')).hide();
-        loadTable('Electricity_Logs');
-    } catch(err) {
-        alert('บันทึกเรียบร้อย กรุณารีเฟรชหน้า');
-        location.reload();
-    }
+        await fetchAPI({ action: 'editData', targetSheet: 'Electricity_Logs', rowIndex: rowIdx, rowData: updatedRow });
+        alert('✅ บันทึกแก้ไขเรียบร้อยแล้ว'); bootstrap.Modal.getInstance(document.getElementById('editElecModal')).hide(); loadTable('Electricity_Logs');
+    } catch(err) { alert('สำเร็จ กรุณารีเฟรชหน้า'); location.reload(); }
 }
 </script>
+    
 </body>
 </html>
