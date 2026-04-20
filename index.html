@@ -85,24 +85,30 @@
         <div class="col-md-10 p-4">
             
             <div id="view-dashboard" class="view-section" style="display: block;">
-                <h3 class="mb-4 fw-bold text-dark"><i class="fas fa-tachometer-alt text-primary me-2"></i> Dashboard ภาพรวม</h3>
+                <h3 class="mb-4 fw-bold text-dark"><i class="fas fa-tachometer-alt text-primary me-2"></i> Dashboard แนวโน้มประจำปี <span id="dash-year-text" class="text-muted"></span></h3>
                 <div class="row mb-4">
-                    <div class="col-md-4">
-                        <div class="card p-3 shadow-sm border-0 border-start border-warning border-4">
-                            <h6 class="text-muted"><i class="fas fa-bolt text-warning"></i> ข้อมูลพลังงาน</h6>
-                            <p class="text-muted small">ระบบบริหารการใช้ไฟฟ้าแยกตามโซนบริการและบ้านพัก</p>
+                    <div class="col-md-6 mb-4">
+                        <div class="card p-3 shadow-sm h-100 border-0">
+                            <h6 class="fw-bold text-muted mb-3"><i class="fas fa-bolt text-warning"></i> แนวโน้มค่าไฟฟ้า (บาท)</h6>
+                            <div style="position: relative; height: 250px; width: 100%;"><canvas id="dashChartElec"></canvas></div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card p-3 shadow-sm border-0 border-start border-info border-4">
-                            <h6 class="text-muted"><i class="fas fa-tint text-info"></i> ข้อมูลทรัพยากรน้ำ</h6>
-                            <p class="text-muted small">ระบบติดตามการใช้น้ำประปารวมของโรงพยาบาล</p>
+                    <div class="col-md-6 mb-4">
+                        <div class="card p-3 shadow-sm h-100 border-0">
+                            <h6 class="fw-bold text-muted mb-3"><i class="fas fa-tint text-info"></i> แนวโน้มค่าน้ำประปา (บาท)</h6>
+                            <div style="position: relative; height: 250px; width: 100%;"><canvas id="dashChartWater"></canvas></div>
                         </div>
                     </div>
-                    <div class="col-md-4">
-                        <div class="card p-3 shadow-sm border-0 border-start border-success border-4">
-                            <h6 class="text-muted"><i class="fas fa-leaf text-success"></i> GREEN&CLEAN</h6>
-                            <p class="text-muted small">ระบบจัดการขยะรีไซเคิลและขยะติดเชื้อเพื่อสิ่งแวดล้อม</p>
+                    <div class="col-md-6 mb-4">
+                        <div class="card p-3 shadow-sm h-100 border-0">
+                            <h6 class="fw-bold text-muted mb-3"><i class="fas fa-recycle text-success"></i> แนวโน้มขยะรีไซเคิลรวม (กก.)</h6>
+                            <div style="position: relative; height: 250px; width: 100%;"><canvas id="dashChartRecycle"></canvas></div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card p-3 shadow-sm h-100 border-0">
+                            <h6 class="fw-bold text-muted mb-3"><i class="fas fa-biohazard text-danger"></i> แนวโน้มขยะติดเชื้อ (กก.)</h6>
+                            <div style="position: relative; height: 250px; width: 100%;"><canvas id="dashChartInfectious"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -508,12 +514,35 @@
             $('#chart-card').fadeIn(); if(myChart) myChart.destroy();
             myChart = new Chart(document.getElementById('comparisonChart').getContext('2d'), { type: 'bar', data: { labels: months, datasets: [{ label: `ปี ${y1}`, data: d1, backgroundColor: '#0d6efd' }, { label: `ปี ${y2}`, data: d2, backgroundColor: '#ffc107' }, { label: `ปี ${y3}`, data: d3, backgroundColor: '#198754' }]}, options: { responsive: true, maintainAspectRatio: false } });
 
-            const getInsight = (vN, vO, yN, yO) => {
-                if(vO===0) return `ไม่มีข้อมูลของปี ${yO}`; const diff = vN - vO; const pct = (diff/vO)*100;
-                return `เทียบ ${yN} กับ ${yO}: <span class="${diff>0?'text-danger':'text-success'}">${diff>0?'เพิ่มขึ้น':'ลดลง'} ${Math.abs(diff).toLocaleString()}</span> คิดเป็น ${Math.abs(pct).toFixed(2)}%`;
+            // --- โค้ดส่วนนี้คือตัวที่แก้ไข Logic ใหม่ ---
+            const getInsight = (valNew, valOld, yearNew, yearOld) => {
+                if(valOld === 0) return `ไม่มีข้อมูลของปี ${yearOld} สำหรับเปรียบเทียบ`; 
+                
+                const diff = valNew - valOld; // เอาปีใหม่ตั้ง ลบ ปีเก่า (ถ้าบวก=เพิ่มขึ้น, ถ้าลบ=ลดลง)
+                const pct = (diff / valOld) * 100;
+                
+                // ถ้าน้อยลงเป็นเรื่องดี (สีเขียว) / ถ้ามากขึ้นเป็นค่าใช้จ่ายหรือขยะที่เพิ่มขึ้น (สีแดง)
+                const statusStr = diff > 0 
+                    ? `<span class="text-danger"><i class="fas fa-arrow-up"></i> เพิ่มขึ้น</span>` 
+                    : `<span class="text-success"><i class="fas fa-arrow-down"></i> ลดลง</span>`;
+                    
+                return `เทียบ <b>ปี ${yearNew}</b> กับ <b>ปี ${yearOld}</b>: ${statusStr} <b>${Math.abs(diff).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</b> คิดเป็น <b>${Math.abs(pct).toFixed(2)}%</b>`;
             };
-            $('#insight-container').html(`<h5><i class="fas fa-lightbulb text-warning"></i> Insights</h5><ul><li>${getInsight(s1,s2,y1,y2)}</li><li>${getInsight(s2,s3,y2,y3)}</li></ul><div class="small">รวมปี ${y1}: ${s1.toLocaleString()} | ปี ${y2}: ${s2.toLocaleString()} | ปี ${y3}: ${s3.toLocaleString()}</div>`).fadeIn();
-        } catch(e) {} finally { $('#btn-compare').html('วิเคราะห์').prop('disabled', false); }
+            
+            // สลับการส่งค่าเป็น (ปีใหม่, ปีเก่า, ชื่อปีใหม่, ชื่อปีเก่า)
+            $('#insight-container').html(`
+                <h5 class="fw-bold mb-3"><i class="fas fa-lightbulb text-warning"></i> Insights สรุปผล</h5>
+                <ul>
+                    <li class="mb-2">${getInsight(s2, s1, y2, y1)}</li>
+                    <li class="mb-2">${getInsight(s3, s2, y3, y2)}</li>
+                </ul>
+                <div class="small mt-3 pt-2 border-top text-muted">
+                    <b>ยอดรวมสุทธิ:</b> ปี ${y1} = ${s1.toLocaleString(undefined, {minimumFractionDigits: 2})} | ปี ${y2} = ${s2.toLocaleString(undefined, {minimumFractionDigits: 2})} | ปี ${y3} = ${s3.toLocaleString(undefined, {minimumFractionDigits: 2})}
+                </div>
+            `).fadeIn();
+            // ----------------------------------------
+            
+        } catch(e) { console.error(e); } finally { $('#btn-compare').html('<i class="fas fa-search me-2"></i> วิเคราะห์').prop('disabled', false); }
     }
 </script>
 </body>
