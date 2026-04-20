@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JVL ERP - บริหารจัดการพลังงาน</title>
+    <title>JVL ERP - บริหารจัดการพลังงานและสิ่งแวดล้อม</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
@@ -11,104 +11,160 @@
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f8f9fa; }
         .nav-sidebar { background: #212529; min-height: 100vh; color: white; }
-        .nav-sidebar a { color: #adb5bd; text-decoration: none; padding: 15px; display: block; }
-        .nav-sidebar a.active { background: #0d6efd; color: white; }
-        .card { border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); }
-        #login-page { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .nav-sidebar a { color: #adb5bd; text-decoration: none; padding: 12px 15px; display: block; border-left: 3px solid transparent; transition: 0.2s;}
+        .nav-sidebar a:hover { background: #343a40; color: white; }
+        .nav-sidebar a.active { background: #0d6efd; color: white; border-left: 3px solid #6ea8fe; }
+        .card { border: none; box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075); border-radius: 10px; }
+        .view-section { display: none; }
+        #login-page { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .form-label { font-weight: 500; font-size: 0.95rem; color: #495057; }
+        .input-group-text { background-color: #e9ecef; }
     </style>
 </head>
 <body>
 
 <div id="login-page">
     <div class="card p-4 shadow-lg" style="width: 350px;">
-        <h4 class="text-center mb-4">JVL ERP Login</h4>
+        <div class="text-center mb-4">
+            <i class="fas fa-hospital-alt fa-3x text-primary mb-2"></i>
+            <h4 class="fw-bold">JVL ERP</h4>
+            <p class="text-muted small">ระบบบริหารกลุ่มภารกิจอำนวยการ</p>
+        </div>
         <input type="text" id="user" class="form-control mb-3" placeholder="ชื่อผู้ใช้งาน">
         <input type="password" id="pass" class="form-control mb-3" placeholder="รหัสผ่าน">
-        <button onclick="login()" class="btn btn-primary w-100">เข้าสู่ระบบ</button>
+        <button onclick="login()" class="btn btn-primary w-100 fw-bold">เข้าสู่ระบบ</button>
     </div>
 </div>
 
 <div id="main-app" style="display:none;" class="container-fluid">
     <div class="row">
         <div class="col-md-2 p-0 nav-sidebar d-none d-md-block">
-            <div class="p-3 text-center"><h5>ระบบบริหารส่วนกลาง</h5></div>
-            <a href="#" onclick="switchTab('input')" id="tab-input" class="active"><i class="fas fa-edit me-2"></i> บันทึกข้อมูล</a>
-            <a href="#" onclick="switchTab('report')" id="tab-report"><i class="fas fa-chart-bar me-2"></i> รายงาน/แก้ไขข้อมูล</a>
-            <a href="#" onclick="location.reload()" class="text-danger mt-5"><i class="fas fa-sign-out-alt me-2"></i> ออกจากระบบ</a>
+            <div class="p-3 text-center border-bottom border-secondary mb-3">
+                <h5 class="m-0 fw-bold">ระบบส่วนกลาง</h5>
+            </div>
+            <div class="px-3 mb-2 small text-secondary fw-bold">บันทึกข้อมูลรายเดือน</div>
+            <a href="#" onclick="switchTab('elec')" id="tab-elec" class="active"><i class="fas fa-bolt text-warning me-2" style="width: 20px;"></i> ค่าไฟฟ้า</a>
+            <a href="#" onclick="switchTab('water')" id="tab-water"><i class="fas fa-tint text-info me-2" style="width: 20px;"></i> ค่าน้ำประปา</a>
+            <a href="#" onclick="switchTab('recycle')" id="tab-recycle"><i class="fas fa-recycle text-success me-2" style="width: 20px;"></i> ขยะรีไซเคิล</a>
+            <a href="#" onclick="switchTab('infectious')" id="tab-infectious"><i class="fas fa-biohazard text-danger me-2" style="width: 20px;"></i> ขยะติดเชื้อ</a>
+            
+            <div class="px-3 mt-4 mb-2 small text-secondary fw-bold">ระบบจัดการ</div>
+            <a href="#" onclick="switchTab('report')" id="tab-report"><i class="fas fa-table me-2" style="width: 20px;"></i> รายงานและข้อมูล</a>
+            <a href="#" onclick="location.reload()" class="text-danger mt-3"><i class="fas fa-sign-out-alt me-2" style="width: 20px;"></i> ออกจากระบบ</a>
         </div>
         
-        <div class="col-md-10 p-4">
-            <div id="view-input">
-                <h3 class="mb-4">บันทึกข้อมูลประจำเดือน</h3>
-                <div class="row">
-                    <div class="col-md-7">
-                        <div class="card p-4 mb-4">
-                            <h5><i class="fas fa-bolt text-warning me-2"></i> บันทึกค่าไฟฟ้า (แยกโซน)</h5>
-                            <form id="elecForm" onsubmit="saveElec(event)">
-                                <div class="row mb-3">
-                                    <div class="col-md-6">
-                                        <label>ประจำเดือน</label>
-                                        <select name="month" class="form-select" required></select>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label>ปี พ.ศ.</label>
-                                        <select name="year" class="form-select" required></select>
-                                    </div>
-                                </div>
-                                <div class="row border-top pt-3">
-                                    <div class="col-md-6">
-                                        <p class="fw-bold text-primary">โซนบ้านพัก</p>
-                                        <input type="number" step="0.01" name="h_unit" class="form-control mb-2" placeholder="หน่วยที่ใช้" required>
-                                        <input type="number" step="0.01" name="h_price" class="form-control" placeholder="ราคา (บาท)" required>
-                                    </div>
-                                    <div class="col-md-6 border-start">
-                                        <p class="fw-bold text-success">โซนบริการ/สำนักงาน</p>
-                                        <input type="number" step="0.01" name="s_unit" class="form-control mb-2" placeholder="หน่วยที่ใช้" required>
-                                        <input type="number" step="0.01" name="s_price" class="form-control" placeholder="ราคา (บาท)" required>
-                                    </div>
-                                </div>
-                                <button type="submit" class="btn btn-warning mt-3 w-100">บันทึกค่าไฟทั้งหมด</button>
-                            </form>
+        <div class="col-md-10 p-4 bg-light">
+            
+            <div id="view-elec" class="view-section" style="display: block;">
+                <h3 class="mb-4 text-dark"><i class="fas fa-bolt text-warning me-2"></i> บันทึกค่าไฟฟ้า (แยกโซน)</h3>
+                <div class="card p-4" style="max-width: 800px;">
+                    <form id="elecForm" onsubmit="submitForm(event, 'Electricity_Logs', 'elec')">
+                        <div class="row mb-4">
+                            <div class="col-md-6"><label class="form-label">ประจำเดือน</label><select name="month" class="form-select month-select" required></select></div>
+                            <div class="col-md-6"><label class="form-label">ปี พ.ศ.</label><select name="year" class="form-select year-select" required></select></div>
                         </div>
-                    </div>
-                    <div class="col-md-5">
-                        <div class="card p-4">
-                            <h5><i class="fas fa-tint text-info me-2"></i> บันทึกค่าน้ำประปา (รวม)</h5>
-                            <form id="waterForm" onsubmit="saveWater(event)">
-                                <div class="mb-2">
-                                    <label>เดือน/ปี</label>
-                                    <div class="input-group">
-                                        <select name="month" class="form-select" id="w_month"></select>
-                                        <select name="year" class="form-select" id="w_year"></select>
-                                    </div>
-                                </div>
-                                <div class="mb-2">
-                                    <label>หน่วยรวมทั้ง รพ.</label>
-                                    <input type="number" step="0.01" name="units" class="form-control" required>
-                                </div>
-                                <div class="mb-3">
-                                    <label>ยอดเงินรวม (บาท)</label>
-                                    <input type="number" step="0.01" name="price" class="form-control" required>
-                                </div>
-                                <button type="submit" class="btn btn-info text-white w-100">บันทึกค่าน้ำ</button>
-                            </form>
+                        <div class="row border-top pt-3">
+                            <div class="col-md-6">
+                                <h6 class="fw-bold text-primary mb-3">โซนบ้านพัก</h6>
+                                <div class="mb-2"><input type="number" step="0.01" name="h_unit" class="form-control" placeholder="หน่วยที่ใช้" required></div>
+                                <div><input type="number" step="0.01" name="h_price" class="form-control" placeholder="ราคา (บาท)" required></div>
+                            </div>
+                            <div class="col-md-6 border-start">
+                                <h6 class="fw-bold text-success mb-3">โซนบริการ/สำนักงาน</h6>
+                                <div class="mb-2"><input type="number" step="0.01" name="s_unit" class="form-control" placeholder="หน่วยที่ใช้" required></div>
+                                <div><input type="number" step="0.01" name="s_price" class="form-control" placeholder="ราคา (บาท)" required></div>
+                            </div>
                         </div>
+                        <button type="submit" class="btn btn-primary mt-4 w-100 fw-bold"><i class="fas fa-save me-2"></i>บันทึกค่าไฟ</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-water" class="view-section">
+                <h3 class="mb-4 text-dark"><i class="fas fa-tint text-info me-2"></i> บันทึกค่าน้ำประปา (มิเตอร์รวม)</h3>
+                <div class="card p-4" style="max-width: 600px;">
+                    <form id="waterForm" onsubmit="submitForm(event, 'Water_Logs', 'water')">
+                        <div class="row mb-3">
+                            <div class="col-md-6"><label class="form-label">ประจำเดือน</label><select name="month" class="form-select month-select" required></select></div>
+                            <div class="col-md-6"><label class="form-label">ปี พ.ศ.</label><select name="year" class="form-select year-select" required></select></div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">หน่วยรวมทั้งโรงพยาบาล</label>
+                            <input type="number" step="0.01" name="units" class="form-control" placeholder="ลูกบาศก์เมตร" required>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label">ยอดเงินรวม (บาท)</label>
+                            <input type="number" step="0.01" name="price" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-info text-white w-100 fw-bold"><i class="fas fa-save me-2"></i>บันทึกค่าน้ำ</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-recycle" class="view-section">
+                <h3 class="mb-4 text-dark"><i class="fas fa-recycle text-success me-2"></i> บันทึกขยะ Recycle (กิโลกรัม)</h3>
+                <div class="card p-4" style="max-width: 900px;">
+                    <form id="recycleForm" onsubmit="submitForm(event, 'Recycle_Logs', 'recycle')">
+                        <div class="row mb-4 bg-light p-3 rounded">
+                            <div class="col-md-6"><label class="form-label">ประจำเดือน</label><select name="month" class="form-select month-select" required></select></div>
+                            <div class="col-md-6"><label class="form-label">ปี พ.ศ.</label><select name="year" class="form-select year-select" required></select></div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 pe-md-4">
+                                <h6 class="text-success border-bottom pb-2 mb-3">กลุ่มกระดาษและพลาสติก</h6>
+                                <div class="input-group mb-2"><span class="input-group-text w-50">กระดาษอ่อน+สี</span><input type="number" step="0.01" name="r1" class="form-control" value="0" required></div>
+                                <div class="input-group mb-2"><span class="input-group-text w-50">กระดาษแข็ง</span><input type="number" step="0.01" name="r2" class="form-control" value="0" required></div>
+                                <div class="input-group mb-2"><span class="input-group-text w-50">กระดาษขาว-ดำ</span><input type="number" step="0.01" name="r3" class="form-control" value="0" required></div>
+                                <div class="input-group mb-2"><span class="input-group-text w-50">ขวดน้ำใส</span><input type="number" step="0.01" name="r5" class="form-control" value="0" required></div>
+                                <div class="input-group mb-4"><span class="input-group-text w-50">พลาสติกรวม</span><input type="number" step="0.01" name="r6" class="form-control" value="0" required></div>
+                            </div>
+                            <div class="col-md-6 ps-md-4 border-start">
+                                <h6 class="text-secondary border-bottom pb-2 mb-3">กลุ่มโลหะและแก้ว</h6>
+                                <div class="input-group mb-2"><span class="input-group-text w-50">อลูมิเนียม</span><input type="number" step="0.01" name="r4" class="form-control" value="0" required></div>
+                                <div class="input-group mb-2"><span class="input-group-text w-50">เหล็กรวม</span><input type="number" step="0.01" name="r7" class="form-control" value="0" required></div>
+                                <div class="input-group mb-2"><span class="input-group-text w-50">โลป๋อง</span><input type="number" step="0.01" name="r8" class="form-control" value="0" required></div>
+                                <div class="input-group mb-2"><span class="input-group-text w-50">กระป๋องสังกะสี</span><input type="number" step="0.01" name="r9" class="form-control" value="0" required></div>
+                                <div class="input-group mb-4"><span class="input-group-text w-50">ขวดแก้วรวม</span><input type="number" step="0.01" name="r10" class="form-control" value="0" required></div>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success w-100 fw-bold"><i class="fas fa-save me-2"></i>บันทึกข้อมูลขยะ Recycle</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-infectious" class="view-section">
+                <h3 class="mb-4 text-dark"><i class="fas fa-biohazard text-danger me-2"></i> บันทึกขยะติดเชื้อ (กิโลกรัม)</h3>
+                <div class="card p-4 border-danger border-opacity-25" style="max-width: 600px;">
+                    <form id="infectiousForm" onsubmit="submitForm(event, 'Infectious_Logs', 'infectious')">
+                        <div class="row mb-3">
+                            <div class="col-md-6"><label class="form-label">ประจำเดือน</label><select name="month" class="form-select month-select" required></select></div>
+                            <div class="col-md-6"><label class="form-label">ปี พ.ศ.</label><select name="year" class="form-select year-select" required></select></div>
+                        </div>
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-danger">ปริมาณขยะติดเชื้อรวม (กก.)</label>
+                            <input type="number" step="0.01" name="weight" class="form-control form-control-lg text-danger" required>
+                        </div>
+                        <button type="submit" class="btn btn-danger w-100 fw-bold"><i class="fas fa-save me-2"></i>บันทึกข้อมูลขยะติดเชื้อ</button>
+                    </form>
+                </div>
+            </div>
+
+            <div id="view-report" class="view-section">
+                <h3 class="mb-4"><i class="fas fa-table me-2"></i> รายงานสรุปข้อมูล</h3>
+                <div class="mb-4 d-flex flex-wrap gap-2">
+                    <button class="btn btn-outline-warning text-dark fw-bold" onclick="loadTable('Electricity_Logs')"><i class="fas fa-bolt"></i> ตารางค่าไฟ</button>
+                    <button class="btn btn-outline-info text-dark fw-bold" onclick="loadTable('Water_Logs')"><i class="fas fa-tint"></i> ตารางค่าน้ำ</button>
+                    <button class="btn btn-outline-success fw-bold" onclick="loadTable('Recycle_Logs')"><i class="fas fa-recycle"></i> ตารางขยะ Recycle</button>
+                    <button class="btn btn-outline-danger fw-bold" onclick="loadTable('Infectious_Logs')"><i class="fas fa-biohazard"></i> ตารางขยะติดเชื้อ</button>
+                </div>
+                <div class="card p-4">
+                    <div class="table-responsive">
+                        <table id="mainTable" class="table table-hover table-striped table-bordered w-100 align-middle"></table>
                     </div>
                 </div>
             </div>
 
-            <div id="view-report" style="display:none;">
-                <h3 class="mb-4">รายงานสรุปและจัดการข้อมูล</h3>
-                <div class="mb-3 d-flex gap-2">
-                    <button class="btn btn-outline-primary active" onclick="loadTable('Electricity_Logs')">ตารางค่าไฟ</button>
-                    <button class="btn btn-outline-info" onclick="loadTable('Water_Logs')">ตารางค่าน้ำ</button>
-                </div>
-                <div class="card p-3">
-                    <div class="table-responsive">
-                        <table id="mainTable" class="table table-hover table-bordered w-100"></table>
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -125,76 +181,162 @@
 <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
 <script>
+    // *** นำ URL ของ API จาก Apps Script มาใส่ตรงนี้ ***
     const API_URL = "https://script.google.com/macros/s/AKfycbzY5ToEERO8PdRD2S1KvYWQDvs1fX78Hu4Myq1tzpvJNwbA1KMh2n66Tp4fBcp6F1EvQA/exec";
     let currentUser = "";
 
-    // ตั้งค่าเริ่มต้น
+    // สร้างตัวเลือกเดือนและปีอัตโนมัติ
     const months = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
     const currentYear = new Date().getFullYear() + 543;
 
     function init() {
-        $('select[name="month"]').html(months.map(m => `<option value="${m}">${m}</option>`).join(''));
-        let yearOpts = "";
-        for(let y=currentYear; y>=currentYear-5; y--) yearOpts += `<option value="${y}">${y}</option>`;
-        $('select[name="year"]').html(yearOpts);
+        const monthHtml = months.map(m => `<option value="${m}">${m}</option>`).join('');
+        let yearHtml = "";
+        for(let y = currentYear; y >= currentYear - 5; y--) yearHtml += `<option value="${y}">${y}</option>`;
+        
+        $('.month-select').html(monthHtml);
+        $('.year-select').html(yearHtml);
     }
     init();
 
+    // ฟังก์ชันเข้าสู่ระบบ
     async function login() {
-        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', username: $('#user').val(), password: $('#pass').val() }) });
-        const data = await res.json();
-        if(data.status === "success") {
-            currentUser = data.userData.name;
-            $('#login-page').hide();
-            $('#main-app').show();
-        } else alert(data.message);
+        const btn = document.querySelector('#login-page button');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch(API_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: 'login', username: $('#user').val(), password: $('#pass').val() }) 
+            });
+            const data = await res.json();
+            if(data.status === "success") {
+                currentUser = data.userData.name;
+                $('#login-page').hide();
+                $('#main-app').show();
+            } else {
+                alert(data.message);
+            }
+        } catch (err) {
+            alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
+        } finally {
+            btn.innerHTML = 'เข้าสู่ระบบ';
+            btn.disabled = false;
+        }
     }
 
-    function switchTab(tab) {
+    // ฟังก์ชันสลับหน้าต่าง (Routing)
+    function switchTab(tabId) {
         $('.nav-sidebar a').removeClass('active');
-        $(`#tab-${tab}`).addClass('active');
-        if(tab === 'input') { $('#view-input').show(); $('#view-report').hide(); }
-        else { $('#view-input').hide(); $('#view-report').show(); loadTable('Electricity_Logs'); }
+        $(`#tab-${tabId}`).addClass('active');
+        
+        $('.view-section').hide();
+        $(`#view-${tabId}`).fadeIn(200);
+
+        if(tabId === 'report') {
+            loadTable('Electricity_Logs'); // โหลดหน้าไฟเป็นค่าเริ่มต้น
+        }
     }
 
-    async function saveElec(e) {
+    // ฟังก์ชันหลักสำหรับรวบรวมข้อมูลและบันทึก
+    async function submitForm(e, sheetName, formType) {
         e.preventDefault();
         const fd = new FormData(e.target);
-        const row = [new Date().toLocaleString('th-TH'), fd.get('month'), fd.get('year'), fd.get('h_unit'), fd.get('h_price'), fd.get('s_unit'), fd.get('s_price'), currentUser];
-        await sendData('Electricity_Logs', row);
-        e.target.reset();
+        const btn = e.target.querySelector('button[type="submit"]');
+        const originalBtnText = btn.innerHTML;
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+        btn.disabled = true;
+
+        const timestamp = new Date().toLocaleString('th-TH');
+        const month = fd.get('month');
+        const year = fd.get('year');
+        let rowData = [];
+
+        // จัดเรียง Array ให้ตรงกับโครงสร้างคอลัมน์ของแต่ละ Sheet
+        if (formType === 'elec') {
+            rowData = [timestamp, month, year, fd.get('h_unit'), fd.get('h_price'), fd.get('s_unit'), fd.get('s_price'), currentUser];
+        } else if (formType === 'water') {
+            rowData = [timestamp, month, year, fd.get('units'), fd.get('price'), currentUser];
+        } else if (formType === 'recycle') {
+            rowData = [
+                timestamp, month, year, 
+                fd.get('r1'), fd.get('r2'), fd.get('r3'), fd.get('r4'), fd.get('r5'), 
+                fd.get('r6'), fd.get('r7'), fd.get('r8'), fd.get('r9'), fd.get('r10'), 
+                currentUser
+            ];
+        } else if (formType === 'infectious') {
+            rowData = [timestamp, month, year, fd.get('weight'), currentUser];
+        }
+
+        try {
+            const res = await fetch(API_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: 'saveData', targetSheet: sheetName, rowData: rowData }) 
+            });
+            const data = await res.json();
+            if(data.status === "success") {
+                alert("✅ บันทึกข้อมูลสำเร็จ!");
+                // ล้างค่าฟอร์ม แต่เก็บค่าเดือน/ปี ล่าสุดไว้
+                e.target.reset(); 
+                $('.month-select').val(month);
+                $('.year-select').val(year);
+            }
+        } catch (err) {
+            alert("ส่งคำสั่งแล้ว กรุณาเช็คใน Sheet (อาจติดปัญหา CORS ของเบราว์เซอร์)");
+            e.target.reset();
+        } finally {
+            btn.innerHTML = originalBtnText;
+            btn.disabled = false;
+        }
     }
 
-    async function saveWater(e) {
-        e.preventDefault();
-        const fd = new FormData(e.target);
-        const row = [new Date().toLocaleString('th-TH'), fd.get('month'), fd.get('year'), fd.get('units'), fd.get('price'), currentUser];
-        await sendData('Water_Logs', row);
-        e.target.reset();
-    }
-
-    async function sendData(sheet, row) {
-        await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveData', targetSheet: sheet, rowData: row }) });
-        alert("บันทึกสำเร็จ!");
-    }
-
+    // ฟังก์ชันโหลดตาราง
     async function loadTable(sheetName) {
-        const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getData', targetSheet: sheetName }) });
-        const json = await res.json();
-        const data = json.data;
-        const headers = data[0];
-        const rows = data.slice(1);
+        // อัปเดตสีปุ่ม
+        $('#view-report .btn').removeClass('active').css('opacity', '0.5');
+        event.target.closest('.btn').classList.add('active');
+        event.target.closest('.btn').style.opacity = '1';
 
-        if ($.fn.DataTable.isDataTable('#mainTable')) $('#mainTable').DataTable().destroy();
-        $('#mainTable').empty();
+        $('#mainTable').html('<tr><td class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> กำลังโหลดข้อมูล...</td></tr>');
 
-        $('#mainTable').DataTable({
-            data: rows,
-            columns: headers.map((h, i) => ({ title: h })),
-            dom: 'Bfrtip',
-            buttons: ['copy', 'excel', 'pdf', 'print'],
-            language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' }
-        });
+        try {
+            const res = await fetch(API_URL, { 
+                method: 'POST', 
+                body: JSON.stringify({ action: 'getData', targetSheet: sheetName }) 
+            });
+            const json = await res.json();
+            const data = json.data;
+            
+            if ($.fn.DataTable.isDataTable('#mainTable')) {
+                $('#mainTable').DataTable().destroy();
+            }
+            $('#mainTable').empty();
+
+            if(!data || data.length === 0) {
+                $('#mainTable').html('<tr><td class="text-center py-4">ไม่พบข้อมูล</td></tr>');
+                return;
+            }
+
+            const headers = data[0];
+            const rows = data.slice(1);
+
+            $('#mainTable').DataTable({
+                data: rows,
+                columns: headers.map(h => ({ title: h })),
+                dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>rtip',
+                buttons: [
+                    { extend: 'excel', text: '<i class="fas fa-file-excel"></i> Excel', className: 'btn btn-success btn-sm' },
+                    { extend: 'print', text: '<i class="fas fa-print"></i> Print', className: 'btn btn-secondary btn-sm' }
+                ],
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
+                order: [[0, 'desc']], // เรียงจากวันที่ล่าสุดขึ้นก่อน
+                pageLength: 10
+            });
+        } catch (err) {
+            $('#mainTable').html('<tr><td class="text-center text-danger py-4">โหลดข้อมูลล้มเหลว กรุณาลองใหม่</td></tr>');
+        }
     }
 </script>
 </body>
