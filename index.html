@@ -93,38 +93,38 @@
         <div class="col-md-10 p-4">
             
             <div id="view-dashboard" class="view-section" style="display: block;">
-                <h4 class="mb-4 fw-bold">Dashboard แนวโน้มประจำปี <span id="dash-year"></span></h4>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold m-0"><i class="fas fa-tachometer-alt text-primary me-2"></i> Dashboard แนวโน้มประจำปี</h4>
+                    <div class="d-flex align-items-center bg-white px-3 py-2 rounded shadow-sm border">
+                        <i class="fas fa-calendar-alt text-muted me-2"></i>
+                        <label class="me-2 mb-0 fw-bold text-muted small">เลือกปี พ.ศ.</label>
+                        <select id="dashYearFilter" class="form-select form-select-sm w-auto border-0 fw-bold text-primary" onchange="loadDash()"></select>
+                    </div>
+                </div>
+
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <div class="card p-3 shadow-sm border-0">
                             <h6 class="fw-bold"><i class="fas fa-bolt text-warning"></i> Trend ค่าไฟฟ้ารวม (บาท)</h6>
-                            <div style="position: relative; height: 250px; width: 100%;">
-                                <canvas id="cElec"></canvas>
-                            </div>
+                            <div style="position: relative; height: 250px; width: 100%;"><canvas id="cElec"></canvas></div>
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
                         <div class="card p-3 shadow-sm border-0">
                             <h6 class="fw-bold"><i class="fas fa-tint text-info"></i> Trend ค่าน้ำประปา (บาท)</h6>
-                            <div style="position: relative; height: 250px; width: 100%;">
-                                <canvas id="cWater"></canvas>
-                            </div>
+                            <div style="position: relative; height: 250px; width: 100%;"><canvas id="cWater"></canvas></div>
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
                         <div class="card p-3 shadow-sm border-0">
                             <h6 class="fw-bold"><i class="fas fa-recycle text-success"></i> Trend ขยะรีไซเคิล (กก.)</h6>
-                            <div style="position: relative; height: 250px; width: 100%;">
-                                <canvas id="cRecycle"></canvas>
-                            </div>
+                            <div style="position: relative; height: 250px; width: 100%;"><canvas id="cRecycle"></canvas></div>
                         </div>
                     </div>
                     <div class="col-md-6 mb-4">
                         <div class="card p-3 shadow-sm border-0">
                             <h6 class="fw-bold"><i class="fas fa-biohazard text-danger"></i> Trend ขยะติดเชื้อ (กก.)</h6>
-                            <div style="position: relative; height: 250px; width: 100%;">
-                                <canvas id="cInfectious"></canvas>
-                            </div>
+                            <div style="position: relative; height: 250px; width: 100%;"><canvas id="cInfectious"></canvas></div>
                         </div>
                     </div>
                 </div>
@@ -363,38 +363,34 @@ const API_URL = "https://script.google.com/macros/s/AKfycbzY5ToEERO8PdRD2S1KvYWQ
 
 let currentUser = ""; 
 let userRole = ""; 
-let charts = {}; // เก็บ Object ของกราฟ
-const months = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+let charts = {}; 
 
-// 1. ฟังก์ชัน Utility 
+const months = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
+// เพิ่ม Array ตัวย่อเดือนแบบมาตรฐาน
+const shortMonths = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+
+async function hash(p) { const b = new TextEncoder().encode(p); const h = await crypto.subtle.digest('SHA-256', b); return Array.from(new Uint8Array(h)).map(x=>x.toString(16).padStart(2,'0')).join(''); }
+function switchTab(t) { $('.nav-sidebar a').removeClass('active'); $(`#tab-${t}`).addClass('active'); $('.view-section').hide(); $(`#view-${t}`).show(); if(t==='dashboard') loadDash(); }
+
 function init() {
-    const currentYear = new Date().getFullYear() + 543;
-    let yearOptions = "";
-    for(let i = currentYear; i >= currentYear - 5; i--) {
-        yearOptions += `<option value="${i}">${i}</option>`;
-    }
-    $('.year-sel').html(yearOptions);
+    const y = new Date().getFullYear()+543; 
+    let h = ""; 
+    for(let i=y; i>=y-5; i--) h+=`<option value="${i}">${i}</option>`;
     
-    const monthOptions = months.map(m => `<option value="${m}">${m}</option>`).join('');
-    $('.month-sel').html(monthOptions);
+    $('.year-sel').html(h); 
+    $('.month-sel').html(months.map(m=>`<option value="${m}">${m}</option>`).join(''));
     
-    // ตั้งค่า Default หน้าเปรียบเทียบ
-    setTimeout(() => { 
-        $('#cY2').val(currentYear - 1); 
-        $('#cY3').val(currentYear - 2); 
-    }, 200);
+    // ตั้งค่า Dropdown หน้า Dashboard ให้เป็นปีปัจจุบันเสมอ
+    $('#dashYearFilter').html(h);
+    $('#dashYearFilter').val(y);
+
+    setTimeout(()=>{ $('#cY2').val(y-1); $('#cY3').val(y-2); }, 100);
 }
 init();
 
-function switchTab(tabId) {
-    $('.nav-sidebar a').removeClass('active');
-    $(`#tab-${tabId}`).addClass('active');
-    $('.view-section').hide();
-    $(`#view-${tabId}`).fadeIn(200);
-    
-    if(tabId === 'dashboard') loadDashboard();
-    if(tabId === 'report') loadTable('Electricity_Logs');
-}
+// --- (เว้นโค้ดส่วน Login / Register / Forgot Password เอาไว้เหมือนเดิม) ---
+
+
 
 // 2. ระบบ Security & Login (CryptoJS)
 async function login() {
@@ -560,51 +556,50 @@ async function saveData(e, sheet, type) {
 }
 
 // 5. โหลด Dashboard (Run Charts 4 แกน)
-async function loadDashboard() {
-    const curYear = new Date().getFullYear() + 543;
-    $('#dash-year').text(`(พ.ศ. ${curYear})`);
+// Dashboard & Run Charts (อัปเดตใหม่)
+async function loadDash() {
+    // 1. อ่านค่าปีจาก Dropdown (ถ้ายังไม่มีให้ใช้ปีปัจจุบัน)
+    const selectedYear = $('#dashYearFilter').val() || (new Date().getFullYear() + 543).toString();
     
-    const configs = [
-        { id: 'cElec', sheet: 'Electricity_Logs', color: '#ffc107', idx: 7 }, // ราคาไฟอยู่คอลัมน์ 7
-        { id: 'cWater', sheet: 'Water_Logs', color: '#0dcaf0', idx: 4 },     // ราคาน้ำอยู่คอลัมน์ 4
-        { id: 'cRecycle', sheet: 'Recycle_Logs', color: '#198754', idx: 'sum' }, // ต้องบวกขยะ
-        { id: 'cInfectious', sheet: 'Infectious_Logs', color: '#dc3545', idx: 3 } // น้ำหนักติดเชื้อ
+    const conf = [
+        {id:'cElec', s:'Electricity_Logs', c:'#ffc107', idx:7},
+        {id:'cWater', s:'Water_Logs', c:'#0dcaf0', idx:4},
+        {id:'cRecycle', s:'Recycle_Logs', c:'#198754', idx:'sum'},
+        {id:'cInfectious', s:'Infectious_Logs', c:'#dc3545', idx:3}
     ];
-
-    for(let conf of configs) {
+    
+    for(let f of conf) {
         try {
-            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getData', targetSheet: conf.sheet }) });
+            const res = await fetch(API_URL, {method:'POST', body: JSON.stringify({action:'getData', targetSheet:f.s})});
             const rows = (await res.json()).data.slice(1);
-            
             let d = new Array(12).fill(0);
+            
             rows.forEach(r => {
                 const mIdx = months.indexOf(String(r[1]).trim());
-                if(mIdx !== -1 && String(r[2]).trim() === String(curYear)) {
-                    if(conf.idx === 'sum') {
-                        for(let i=3; i<=12; i++) d[mIdx] += Number(r[i]||0);
+                // 2. เช็คว่าปีในฐานข้อมูล ตรงกับปีที่เลือกใน Dropdown หรือไม่
+                if(mIdx !== -1 && String(r[2]).trim() === selectedYear) {
+                    if(f.idx === 'sum') { 
+                        for(let i=3; i<=12; i++) d[mIdx] += Number(r[i]||0); 
                     } else {
-                        d[mIdx] += Number(r[conf.idx]||0);
+                        d[mIdx] += Number(r[f.idx]||0);
                     }
                 }
             });
-
-            const ctx = document.getElementById(conf.id).getContext('2d');
-            if(charts[conf.id]) charts[conf.id].destroy();
             
-            charts[conf.id] = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: months.map(m => m.substring(0,3)),
-                    datasets: [{
-                        data: d, borderColor: conf.color, backgroundColor: conf.color + '33',
-                        borderWidth: 2, fill: true, tension: 0.3, pointBackgroundColor: conf.color
-                    }]
+            if(charts[f.id]) charts[f.id].destroy();
+            charts[f.id] = new Chart(document.getElementById(f.id), {
+                type:'line', 
+                data:{
+                    // 3. เปลี่ยนไปใช้ shortMonths (ตัวย่อมาตรฐาน)
+                    labels: shortMonths, 
+                    datasets:[{data:d, borderColor:f.c, backgroundColor:f.c+'22', fill:true, tension:0.3}]
                 },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+                options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}} }
             });
-        } catch(e) { console.error(e); }
+        } catch(e) { console.error(`Error loading chart ${f.id}:`, e); }
     }
 }
+
 
 // 6. เปรียบเทียบ 3 ปี (แก้ Logic "ลดลง/เพิ่มขึ้น")
 async function genComp() {
