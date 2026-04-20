@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         body { font-family: 'Sarabun', sans-serif; background-color: #f8f9fa; }
         .nav-sidebar { background: #212529; min-height: 100vh; color: white; }
@@ -19,6 +20,7 @@
         #login-page { background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); height: 100vh; display: flex; align-items: center; justify-content: center; }
         .form-label { font-weight: 500; font-size: 0.95rem; color: #495057; }
         .input-group-text { background-color: #e9ecef; }
+        .chart-container { position: relative; height: 400px; width: 100%; }
     </style>
 </head>
 <body>
@@ -48,9 +50,10 @@
             <a href="#" onclick="switchTab('recycle')" id="tab-recycle"><i class="fas fa-recycle text-success me-2" style="width: 20px;"></i> ขยะรีไซเคิล</a>
             <a href="#" onclick="switchTab('infectious')" id="tab-infectious"><i class="fas fa-biohazard text-danger me-2" style="width: 20px;"></i> ขยะติดเชื้อ</a>
             
-            <div class="px-3 mt-4 mb-2 small text-secondary fw-bold">ระบบจัดการ</div>
-            <a href="#" onclick="switchTab('report')" id="tab-report"><i class="fas fa-table me-2" style="width: 20px;"></i> รายงานและข้อมูล</a>
-            <a href="#" onclick="location.reload()" class="text-danger mt-3"><i class="fas fa-sign-out-alt me-2" style="width: 20px;"></i> ออกจากระบบ</a>
+            <div class="px-3 mt-4 mb-2 small text-secondary fw-bold">ระบบวิเคราะห์และรายงาน</div>
+            <a href="#" onclick="switchTab('compare')" id="tab-compare"><i class="fas fa-chart-line text-warning me-2" style="width: 20px;"></i> เปรียบเทียบรายปี</a>
+            <a href="#" onclick="switchTab('report')" id="tab-report"><i class="fas fa-table me-2" style="width: 20px;"></i> รายงานและข้อมูลดิบ</a>
+            <a href="#" onclick="location.reload()" class="text-danger mt-4"><i class="fas fa-sign-out-alt me-2" style="width: 20px;"></i> ออกจากระบบ</a>
         </div>
         
         <div class="col-md-10 p-4 bg-light">
@@ -88,14 +91,8 @@
                             <div class="col-md-6"><label class="form-label">ประจำเดือน</label><select name="month" class="form-select month-select" required></select></div>
                             <div class="col-md-6"><label class="form-label">ปี พ.ศ.</label><select name="year" class="form-select year-select" required></select></div>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label">หน่วยรวมทั้งโรงพยาบาล</label>
-                            <input type="number" step="0.01" name="units" class="form-control" placeholder="ลูกบาศก์เมตร" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">ยอดเงินรวม (บาท)</label>
-                            <input type="number" step="0.01" name="price" class="form-control" required>
-                        </div>
+                        <div class="mb-3"><label class="form-label">หน่วยรวมทั้งโรงพยาบาล</label><input type="number" step="0.01" name="units" class="form-control" required></div>
+                        <div class="mb-4"><label class="form-label">ยอดเงินรวม (บาท)</label><input type="number" step="0.01" name="price" class="form-control" required></div>
                         <button type="submit" class="btn btn-info text-white w-100 fw-bold"><i class="fas fa-save me-2"></i>บันทึกค่าน้ำ</button>
                     </form>
                 </div>
@@ -109,7 +106,6 @@
                             <div class="col-md-6"><label class="form-label">ประจำเดือน</label><select name="month" class="form-select month-select" required></select></div>
                             <div class="col-md-6"><label class="form-label">ปี พ.ศ.</label><select name="year" class="form-select year-select" required></select></div>
                         </div>
-                        
                         <div class="row">
                             <div class="col-md-6 pe-md-4">
                                 <h6 class="text-success border-bottom pb-2 mb-3">กลุ่มกระดาษและพลาสติก</h6>
@@ -128,7 +124,7 @@
                                 <div class="input-group mb-4"><span class="input-group-text w-50">ขวดแก้วรวม</span><input type="number" step="0.01" name="r10" class="form-control" value="0" required></div>
                             </div>
                         </div>
-                        <button type="submit" class="btn btn-success w-100 fw-bold"><i class="fas fa-save me-2"></i>บันทึกข้อมูลขยะ Recycle</button>
+                        <button type="submit" class="btn btn-success w-100 fw-bold"><i class="fas fa-save me-2"></i>บันทึกข้อมูลขยะ</button>
                     </form>
                 </div>
             </div>
@@ -145,15 +141,50 @@
                             <label class="form-label fw-bold text-danger">ปริมาณขยะติดเชื้อรวม (กก.)</label>
                             <input type="number" step="0.01" name="weight" class="form-control form-control-lg text-danger" required>
                         </div>
-                        <button type="submit" class="btn btn-danger w-100 fw-bold"><i class="fas fa-save me-2"></i>บันทึกข้อมูลขยะติดเชื้อ</button>
+                        <button type="submit" class="btn btn-danger w-100 fw-bold"><i class="fas fa-save me-2"></i>บันทึกขยะติดเชื้อ</button>
                     </form>
                 </div>
             </div>
 
+            <div id="view-compare" class="view-section">
+                <h3 class="mb-4 text-dark"><i class="fas fa-chart-line text-warning me-2"></i> เปรียบเทียบข้อมูลย้อนหลัง (Year-over-Year)</h3>
+                <div class="card p-4 mb-4">
+                    <div class="row align-items-end">
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="form-label text-muted">ข้อมูลที่ต้องการดู</label>
+                            <select id="compType" class="form-select">
+                                <option value="Electricity_Logs">รวมค่าไฟฟ้า (บาท)</option>
+                                <option value="Water_Logs">รวมค่าน้ำประปา (บาท)</option>
+                                <option value="Recycle_Logs">รวมขยะรีไซเคิล (กก.)</option>
+                                <option value="Infectious_Logs">รวมขยะติดเชื้อ (กก.)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="form-label text-muted">ปีหลัก (พ.ศ.)</label>
+                            <select id="compYear1" class="form-select year-select"></select>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <label class="form-label text-muted">ปีที่เปรียบเทียบ (พ.ศ.)</label>
+                            <select id="compYear2" class="form-select year-select"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100 fw-bold" id="btn-compare" onclick="generateComparison()"><i class="fas fa-search me-2"></i> แสดงกราฟ</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card p-4 shadow-sm" id="chart-card" style="display: none;">
+                    <h5 class="text-center mb-4" id="chart-title">กราฟเปรียบเทียบ</h5>
+                    <div class="chart-container">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
             <div id="view-report" class="view-section">
-                <h3 class="mb-4"><i class="fas fa-table me-2"></i> รายงานสรุปข้อมูล</h3>
+                <h3 class="mb-4"><i class="fas fa-table me-2"></i> รายงานสรุปข้อมูลดิบ</h3>
                 <div class="mb-4 d-flex flex-wrap gap-2">
-                    <button class="btn btn-outline-warning text-dark fw-bold" onclick="loadTable('Electricity_Logs')"><i class="fas fa-bolt"></i> ตารางค่าไฟ</button>
+                    <button class="btn btn-outline-warning text-dark fw-bold active" onclick="loadTable('Electricity_Logs')"><i class="fas fa-bolt"></i> ตารางค่าไฟ</button>
                     <button class="btn btn-outline-info text-dark fw-bold" onclick="loadTable('Water_Logs')"><i class="fas fa-tint"></i> ตารางค่าน้ำ</button>
                     <button class="btn btn-outline-success fw-bold" onclick="loadTable('Recycle_Logs')"><i class="fas fa-recycle"></i> ตารางขยะ Recycle</button>
                     <button class="btn btn-outline-danger fw-bold" onclick="loadTable('Infectious_Logs')"><i class="fas fa-biohazard"></i> ตารางขยะติดเชื้อ</button>
@@ -184,8 +215,8 @@
     // *** นำ URL ของ API จาก Apps Script มาใส่ตรงนี้ ***
     const API_URL = "https://script.google.com/macros/s/AKfycbzY5ToEERO8PdRD2S1KvYWQDvs1fX78Hu4Myq1tzpvJNwbA1KMh2n66Tp4fBcp6F1EvQA/exec";
     let currentUser = "";
+    let myChart = null; // ตัวแปรเก็บ Instance ของกราฟ
 
-    // สร้างตัวเลือกเดือนและปีอัตโนมัติ
     const months = ["มกราคม","กุมภาพันธ์","มีนาคม","เมษายน","พฤษภาคม","มิถุนายน","กรกฎาคม","สิงหาคม","กันยายน","ตุลาคม","พฤศจิกายน","ธันวาคม"];
     const currentYear = new Date().getFullYear() + 543;
 
@@ -196,56 +227,46 @@
         
         $('.month-select').html(monthHtml);
         $('.year-select').html(yearHtml);
+        
+        // ให้ปีที่ 2 น้อยกว่าปีแรก 1 ปีเป็นค่าเริ่มต้นในหน้าเปรียบเทียบ
+        setTimeout(() => { $('#compYear2').val(currentYear - 1); }, 100);
     }
     init();
 
-    // ฟังก์ชันเข้าสู่ระบบ
+    // ---------------- [ส่วน Login และ Routing] ----------------
     async function login() {
         const btn = document.querySelector('#login-page button');
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบ...';
         btn.disabled = true;
 
         try {
-            const res = await fetch(API_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ action: 'login', username: $('#user').val(), password: $('#pass').val() }) 
-            });
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'login', username: $('#user').val(), password: $('#pass').val() }) });
             const data = await res.json();
             if(data.status === "success") {
                 currentUser = data.userData.name;
                 $('#login-page').hide();
                 $('#main-app').show();
-            } else {
-                alert(data.message);
-            }
-        } catch (err) {
-            alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้");
-        } finally {
-            btn.innerHTML = 'เข้าสู่ระบบ';
-            btn.disabled = false;
-        }
+            } else alert(data.message);
+        } catch (err) { alert("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้"); } 
+        finally { btn.innerHTML = 'เข้าสู่ระบบ'; btn.disabled = false; }
     }
 
-    // ฟังก์ชันสลับหน้าต่าง (Routing)
     function switchTab(tabId) {
         $('.nav-sidebar a').removeClass('active');
         $(`#tab-${tabId}`).addClass('active');
-        
         $('.view-section').hide();
         $(`#view-${tabId}`).fadeIn(200);
 
-        if(tabId === 'report') {
-            loadTable('Electricity_Logs'); // โหลดหน้าไฟเป็นค่าเริ่มต้น
-        }
+        if(tabId === 'report') loadTable('Electricity_Logs');
+        if(tabId === 'compare' && !myChart) $('#chart-card').hide(); 
     }
 
-    // ฟังก์ชันหลักสำหรับรวบรวมข้อมูลและบันทึก
+    // ---------------- [ส่วนบันทึกข้อมูลและตาราง (ของเดิม)] ----------------
     async function submitForm(e, sheetName, formType) {
         e.preventDefault();
         const fd = new FormData(e.target);
         const btn = e.target.querySelector('button[type="submit"]');
         const originalBtnText = btn.innerHTML;
-        
         btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
         btn.disabled = true;
 
@@ -254,89 +275,173 @@
         const year = fd.get('year');
         let rowData = [];
 
-        // จัดเรียง Array ให้ตรงกับโครงสร้างคอลัมน์ของแต่ละ Sheet
-        if (formType === 'elec') {
-            rowData = [timestamp, month, year, fd.get('h_unit'), fd.get('h_price'), fd.get('s_unit'), fd.get('s_price'), currentUser];
-        } else if (formType === 'water') {
-            rowData = [timestamp, month, year, fd.get('units'), fd.get('price'), currentUser];
-        } else if (formType === 'recycle') {
-            rowData = [
-                timestamp, month, year, 
-                fd.get('r1'), fd.get('r2'), fd.get('r3'), fd.get('r4'), fd.get('r5'), 
-                fd.get('r6'), fd.get('r7'), fd.get('r8'), fd.get('r9'), fd.get('r10'), 
-                currentUser
-            ];
-        } else if (formType === 'infectious') {
-            rowData = [timestamp, month, year, fd.get('weight'), currentUser];
-        }
+        if (formType === 'elec') rowData = [timestamp, month, year, fd.get('h_unit'), fd.get('h_price'), fd.get('s_unit'), fd.get('s_price'), currentUser];
+        else if (formType === 'water') rowData = [timestamp, month, year, fd.get('units'), fd.get('price'), currentUser];
+        else if (formType === 'recycle') rowData = [timestamp, month, year, fd.get('r1'), fd.get('r2'), fd.get('r3'), fd.get('r4'), fd.get('r5'), fd.get('r6'), fd.get('r7'), fd.get('r8'), fd.get('r9'), fd.get('r10'), currentUser];
+        else if (formType === 'infectious') rowData = [timestamp, month, year, fd.get('weight'), currentUser];
 
         try {
-            const res = await fetch(API_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ action: 'saveData', targetSheet: sheetName, rowData: rowData }) 
-            });
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'saveData', targetSheet: sheetName, rowData: rowData }) });
             const data = await res.json();
             if(data.status === "success") {
                 alert("✅ บันทึกข้อมูลสำเร็จ!");
-                // ล้างค่าฟอร์ม แต่เก็บค่าเดือน/ปี ล่าสุดไว้
                 e.target.reset(); 
-                $('.month-select').val(month);
-                $('.year-select').val(year);
+                $('.month-select').val(month); $('.year-select').val(year);
             }
         } catch (err) {
-            alert("ส่งคำสั่งแล้ว กรุณาเช็คใน Sheet (อาจติดปัญหา CORS ของเบราว์เซอร์)");
+            alert("ส่งคำสั่งแล้ว กรุณาเช็คใน Sheet");
             e.target.reset();
-        } finally {
-            btn.innerHTML = originalBtnText;
-            btn.disabled = false;
-        }
+        } finally { btn.innerHTML = originalBtnText; btn.disabled = false; }
     }
 
-    // ฟังก์ชันโหลดตาราง
     async function loadTable(sheetName) {
-        // อัปเดตสีปุ่ม
         $('#view-report .btn').removeClass('active').css('opacity', '0.5');
         event.target.closest('.btn').classList.add('active');
         event.target.closest('.btn').style.opacity = '1';
-
         $('#mainTable').html('<tr><td class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> กำลังโหลดข้อมูล...</td></tr>');
 
         try {
-            const res = await fetch(API_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ action: 'getData', targetSheet: sheetName }) 
-            });
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getData', targetSheet: sheetName }) });
             const json = await res.json();
             const data = json.data;
-            
-            if ($.fn.DataTable.isDataTable('#mainTable')) {
-                $('#mainTable').DataTable().destroy();
-            }
+            if ($.fn.DataTable.isDataTable('#mainTable')) $('#mainTable').DataTable().destroy();
             $('#mainTable').empty();
 
-            if(!data || data.length === 0) {
-                $('#mainTable').html('<tr><td class="text-center py-4">ไม่พบข้อมูล</td></tr>');
-                return;
-            }
-
-            const headers = data[0];
-            const rows = data.slice(1);
-
+            if(!data || data.length === 0) return $('#mainTable').html('<tr><td class="text-center py-4">ไม่พบข้อมูล</td></tr>');
+            
             $('#mainTable').DataTable({
-                data: rows,
-                columns: headers.map(h => ({ title: h })),
+                data: data.slice(1),
+                columns: data[0].map(h => ({ title: h })),
                 dom: '<"row"<"col-sm-12 col-md-6"B><"col-sm-12 col-md-6"f>>rtip',
                 buttons: [
                     { extend: 'excel', text: '<i class="fas fa-file-excel"></i> Excel', className: 'btn btn-success btn-sm' },
                     { extend: 'print', text: '<i class="fas fa-print"></i> Print', className: 'btn btn-secondary btn-sm' }
                 ],
                 language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' },
-                order: [[0, 'desc']], // เรียงจากวันที่ล่าสุดขึ้นก่อน
-                pageLength: 10
+                order: [[0, 'desc']], pageLength: 10
             });
+        } catch (err) { $('#mainTable').html('<tr><td class="text-center text-danger py-4">โหลดข้อมูลล้มเหลว</td></tr>'); }
+    }
+
+    // ---------------- [ส่วนเปรียบเทียบข้อมูล (ใหม่)] ----------------
+    async function generateComparison() {
+        const type = $('#compType').val();
+        const typeName = $('#compType option:selected').text();
+        const year1 = $('#compYear1').val();
+        const year2 = $('#compYear2').val();
+        const btn = document.getElementById('btn-compare');
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังประมวลผล...';
+        btn.disabled = true;
+
+        try {
+            // ดึงข้อมูลทั้งหมดจาก Sheet ที่เลือก
+            const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify({ action: 'getData', targetSheet: type }) });
+            const json = await res.json();
+            const rows = json.data.slice(1); // ตัด Header ออก
+
+            // เตรียม Array เก็บผลรวม 12 เดือนของแต่ละปี
+            let dataY1 = new Array(12).fill(0);
+            let dataY2 = new Array(12).fill(0);
+
+            // วนลูปอ่านข้อมูลและนำมาบวกกันตามประเภท
+            rows.forEach(row => {
+                const rowMonth = String(row[1]).trim();
+                const rowYear = String(row[2]).trim();
+                const monthIndex = months.indexOf(rowMonth);
+                
+                if(monthIndex === -1) return;
+
+                let sumValue = 0;
+                // ตรรกะการหาผลรวมของแต่ละประเภท
+                if (type === 'Electricity_Logs') {
+                    // รวมค่าไฟบ้านพัก (col 4) + บริการ (col 6)
+                    sumValue = Number(row[4] || 0) + Number(row[6] || 0); 
+                } else if (type === 'Water_Logs') {
+                    // ค่าไฟ (col 4)
+                    sumValue = Number(row[4] || 0); 
+                } else if (type === 'Recycle_Logs') {
+                    // รวมขยะรีไซเคิล r1 ถึง r10 (col 3 ถึง 12)
+                    for(let i = 3; i <= 12; i++) sumValue += Number(row[i] || 0); 
+                } else if (type === 'Infectious_Logs') {
+                    // ขยะติดเชื้อ (col 3)
+                    sumValue = Number(row[3] || 0); 
+                }
+
+                // นำยอดไปใส่ใน Array ของปีนั้นๆ
+                if(rowYear === year1) dataY1[monthIndex] += sumValue;
+                if(rowYear === year2) dataY2[monthIndex] += sumValue;
+            });
+
+            // แสดง Card และวาดกราฟ
+            $('#chart-card').fadeIn();
+            $('#chart-title').text(`เปรียบเทียบ ${typeName} (ปี ${year1} vs ${year2})`);
+            renderChart(typeName, year1, year2, dataY1, dataY2);
+
         } catch (err) {
-            $('#mainTable').html('<tr><td class="text-center text-danger py-4">โหลดข้อมูลล้มเหลว กรุณาลองใหม่</td></tr>');
+            alert("เกิดข้อผิดพลาดในการโหลดข้อมูล");
+            console.error(err);
+        } finally {
+            btn.innerHTML = '<i class="fas fa-search me-2"></i> แสดงกราฟ';
+            btn.disabled = false;
         }
+    }
+
+    function renderChart(label, y1, y2, data1, data2) {
+        const ctx = document.getElementById('comparisonChart').getContext('2d');
+        
+        // ถ้ามีกราฟเก่าอยู่ ให้ลบออกก่อนวาดใหม่
+        if (myChart) {
+            myChart.destroy();
+        }
+
+        myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: months,
+                datasets: [
+                    {
+                        label: `ปี พ.ศ. ${y1}`,
+                        data: data1,
+                        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    },
+                    {
+                        label: `ปี พ.ศ. ${y2}`,
+                        data: data2,
+                        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { position: 'top' },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) { label += ': '; }
+                                if (context.parsed.y !== null) {
+                                    // เพิ่มคอมม่าคั่นหลักพัน
+                                    label += new Intl.NumberFormat('th-TH').format(context.parsed.y);
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: { beginAtZero: true }
+                }
+            }
+        });
     }
 </script>
 </body>
