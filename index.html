@@ -23,23 +23,69 @@
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
 
     <style>
-        body { font-family: 'Sarabun', sans-serif; background-color: #f4f7f6; }
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            background-color: #f4f7f6; 
+        }
         
+        /* สไตล์หน้า Login */
         #login-page {
             background: url('https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=2053&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover; height: 100vh; display: flex; align-items: center; justify-content: center; position: relative;
+            background-size: cover; 
+            height: 100vh; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            position: relative;
         }
-        #login-page::before { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(13, 110, 253, 0.2); backdrop-filter: blur(10px); }
-        .glass-card { background: rgba(255, 255, 255, 0.95); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; z-index: 1; padding: 40px; width: 90%; max-width: 420px; text-align: center; }
-        .hospital-logo { width: 90px; margin-bottom: 15px; }
+        #login-page::before { 
+            content: ""; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(13, 110, 253, 0.2); 
+            backdrop-filter: blur(10px); 
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95); 
+            border-radius: 20px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2); 
+            position: relative; 
+            z-index: 1; 
+            padding: 40px; 
+            width: 90%; 
+            max-width: 420px; 
+            text-align: center;
+        }
+        .hospital-logo { 
+            width: 100px; 
+            margin-bottom: 15px; 
+        }
         
-        .nav-sidebar { background-color: #1a252f !important; min-height: 100vh; color: white; box-shadow: 2px 0 10px rgba(0,0,0,0.1); z-index: 1045; }
+        /* สไตล์ Sidebar สีเข้ม */
+        .nav-sidebar { 
+            background-color: #1a252f !important; 
+            min-height: 100vh; 
+            color: white; 
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1); 
+            z-index: 1045; 
+        }
         .offcanvas.nav-sidebar { background-color: #1a252f !important; }
         .offcanvas-header { background-color: #11181f !important; border-bottom: 1px solid #2c3e50 !important; color: white; }
         .offcanvas-body { background-color: #1a252f !important; padding: 0; }
         .btn-close-white { filter: invert(1) grayscale(100%) brightness(200%); }
 
-        .nav-sidebar a.nav-link-main { color: #cbd5e1; text-decoration: none; padding: 15px 20px; display: block; border-left: 4px solid transparent; transition: 0.3s; font-weight: 500; }
+        .nav-sidebar a.nav-link-main { 
+            color: #cbd5e1; 
+            text-decoration: none; 
+            padding: 15px 20px; 
+            display: block; 
+            border-left: 4px solid transparent; 
+            transition: 0.3s; 
+            font-weight: 500; 
+        }
         .nav-sidebar a.nav-link-main:hover { background: #2c3e50; color: white; }
         .nav-sidebar a.nav-link-main.active { background: #3498db; color: white; border-left: 4px solid #f1c40f; }
         
@@ -52,11 +98,22 @@
         .nav-sidebar .accordion-body a:hover { color: white; background-color: #1a252f; }
         .nav-sidebar .accordion-body a.active { color: white; background-color: #3498db; border-left: 4px solid #f1c40f; }
 
+        /* โครงสร้างหลัก */
         .view-section { display: none; }
         .calc-readonly { background-color: #e9ecef; font-weight: bold; color: #198754; cursor: not-allowed; }
         .insight-card { border-left: 5px solid #ffc107; background-color: #fffbeb; padding: 20px; border-radius: 10px; margin-bottom: 20px; }
+        
         .main-content-area { height: 100vh; overflow-y: auto; padding-top: 20px; }
         @media (max-width: 768px) { .main-content-area { height: calc(100vh - 60px); padding-top: 20px; } }
+
+        /* สไตล์สำหรับ Card ใน Dashboard ให้กดได้ */
+        .dash-card { transition: all 0.3s ease; border-radius: 15px; border: none; }
+        .dash-card-clickable:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important; cursor: pointer; border-color: #3498db !important; }
+        
+        /* สไตล์ตารางตรวจคุณภาพน้ำ */
+        .wq-status-pass { color: #198754; font-weight: bold; }
+        .wq-status-fail { color: #dc3545; font-weight: bold; }
+        .wq-status-none { color: #6c757d; font-style: italic; }
     </style>
 </head>
 <body>
@@ -69,14 +126,28 @@
         
         <div class="mt-4 text-start">
             <label class="small text-muted mb-1">ชื่อผู้ใช้งาน</label>
-            <div class="input-group mb-3"><span class="input-group-text bg-white"><i class="fas fa-user text-muted"></i></span><input type="text" id="user" class="form-control" placeholder="Username"></div>
+            <div class="input-group mb-3">
+                <span class="input-group-text bg-white"><i class="fas fa-user text-muted"></i></span>
+                <input type="text" id="user" class="form-control" placeholder="Username">
+            </div>
+            
             <label class="small text-muted mb-1">รหัสผ่าน</label>
-            <div class="input-group mb-4"><span class="input-group-text bg-white"><i class="fas fa-lock text-muted"></i></span><input type="password" id="pass" class="form-control" placeholder="Password" onkeypress="if(event.key==='Enter') login()"></div>
+            <div class="input-group mb-4">
+                <span class="input-group-text bg-white"><i class="fas fa-lock text-muted"></i></span>
+                <input type="password" id="pass" class="form-control" placeholder="Password" onkeypress="if(event.key==='Enter') login()">
+            </div>
             
-            <button id="btn-login" onclick="login()" class="btn btn-primary w-100 fw-bold mb-2 shadow-sm"><i class="fas fa-sign-in-alt me-2"></i>เข้าสู่ระบบ</button>
-            <button onclick="loginGuest()" class="btn btn-outline-secondary w-100 fw-bold mb-3 shadow-sm"><i class="fas fa-eye me-2"></i>เข้าดูแบบ Guest</button>
+            <button id="btn-login" onclick="login()" class="btn btn-primary w-100 fw-bold mb-2 shadow-sm">
+                <i class="fas fa-sign-in-alt me-2"></i> เข้าสู่ระบบ
+            </button>
+            <button onclick="loginGuest()" class="btn btn-outline-secondary w-100 fw-bold mb-3 shadow-sm">
+                <i class="fas fa-eye me-2"></i> เข้าดูแบบ Guest (เยี่ยมชม)
+            </button>
             
-            <div class="d-flex justify-content-between small px-2"><a href="#" class="text-decoration-none" onclick="new bootstrap.Modal(document.getElementById('regModal')).show()">สมัครสมาชิกใหม่</a><a href="#" class="text-decoration-none text-danger" onclick="new bootstrap.Modal(document.getElementById('forgotModal')).show()">ลืมรหัสผ่าน?</a></div>
+            <div class="d-flex justify-content-between small px-2">
+                <a href="#" class="text-decoration-none" onclick="new bootstrap.Modal(document.getElementById('regModal')).show()">สมัครสมาชิกใหม่</a>
+                <a href="#" class="text-decoration-none text-danger" onclick="new bootstrap.Modal(document.getElementById('forgotModal')).show()">ลืมรหัสผ่าน?</a>
+            </div>
         </div>
     </div>
 </div>
@@ -84,14 +155,21 @@
 <div id="main-app" class="container-fluid p-0" style="display:none;">
     
     <nav class="navbar navbar-dark bg-dark d-md-none px-3 shadow-sm" style="height: 60px;">
-        <span class="navbar-brand mb-0 h1 fw-bold d-flex align-items-center" style="font-size: 1.1rem;"><img src="https://www.rploei.go.th/ec2/wp-content/uploads/2017/08/cropped-cropped-cropped-3.png" width="30" class="me-2 rounded bg-white p-1"> JVL ERP</span>
-        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu"><span class="navbar-toggler-icon"></span></button>
+        <span class="navbar-brand mb-0 h1 fw-bold d-flex align-items-center" style="font-size: 1.1rem;">
+            <img src="https://www.rploei.go.th/ec2/wp-content/uploads/2017/08/cropped-cropped-cropped-3.png" width="30" class="me-2 rounded bg-white p-1"> JVL ERP
+        </span>
+        <button class="navbar-toggler border-0 shadow-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebarMenu">
+            <span class="navbar-toggler-icon"></span>
+        </button>
     </nav>
 
     <div class="row g-0">
+        
         <div class="col-md-2 p-0 nav-sidebar offcanvas-md offcanvas-start" tabindex="-1" id="sidebarMenu">
             <div class="offcanvas-header d-md-none">
-                <h6 class="offcanvas-title text-white fw-bold d-flex align-items-center"><img src="https://www.rploei.go.th/ec2/wp-content/uploads/2017/08/cropped-cropped-cropped-3.png" width="24" class="me-2 rounded bg-white p-1"> JVL ERP SYSTEM</h6>
+                <h6 class="offcanvas-title text-white fw-bold d-flex align-items-center">
+                    <img src="https://www.rploei.go.th/ec2/wp-content/uploads/2017/08/cropped-cropped-cropped-3.png" width="24" class="me-2 rounded bg-white p-1"> JVL ERP SYSTEM
+                </h6>
                 <button type="button" class="btn-close btn-close-white shadow-none" data-bs-dismiss="offcanvas" data-bs-target="#sidebarMenu"></button>
             </div>
             
@@ -101,12 +179,16 @@
                     <h6 class="m-0 fw-bold text-white">JVL ERP SYSTEM</h6>
                 </div>
                 
-                <a href="#" onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-link-main active"><i class="fas fa-chart-line me-2"></i> Dashboard</a>
+                <a href="#" onclick="switchTab('dashboard')" id="tab-dashboard" class="nav-link-main active">
+                    <i class="fas fa-chart-line me-2"></i> Dashboard
+                </a>
                 
                 <div id="admin-menu" class="accordion accordion-flush w-100">
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingEnergy">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEnergy"><span><i class="fas fa-bolt text-warning me-2"></i> พลังงาน & น้ำมัน</span></button>
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEnergy">
+                                <span><i class="fas fa-bolt text-warning me-2"></i> พลังงาน & น้ำมัน</span>
+                            </button>
                         </h2>
                         <div id="collapseEnergy" class="accordion-collapse collapse" data-bs-parent="#admin-menu">
                             <div class="accordion-body">
@@ -116,9 +198,12 @@
                             </div>
                         </div>
                     </div>
+
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingWaste">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWaste"><span><i class="fas fa-leaf text-success me-2"></i> จัดการสิ่งแวดล้อม</span></button>
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWaste">
+                                <span><i class="fas fa-leaf text-success me-2"></i> จัดการสิ่งแวดล้อม</span>
+                            </button>
                         </h2>
                         <div id="collapseWaste" class="accordion-collapse collapse" data-bs-parent="#admin-menu">
                             <div class="accordion-body">
@@ -128,9 +213,12 @@
                             </div>
                         </div>
                     </div>
+                    
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingWaterQ">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWaterQ"><span><i class="fas fa-vial text-info me-2"></i> ตรวจสอบคุณภาพน้ำ</span></button>
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseWaterQ">
+                                <span><i class="fas fa-vial text-info me-2"></i> ตรวจสอบคุณภาพน้ำ</span>
+                            </button>
                         </h2>
                         <div id="collapseWaterQ" class="accordion-collapse collapse" data-bs-parent="#admin-menu">
                             <div class="accordion-body">
@@ -144,41 +232,104 @@
                 <div class="accordion accordion-flush w-100" id="analysis-menu">
                     <div class="accordion-item">
                         <h2 class="accordion-header" id="headingAnalysis">
-                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnalysis"><span><i class="fas fa-chart-pie text-primary me-2"></i> วิเคราะห์ & รายงาน</span></button>
+                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseAnalysis">
+                                <span><i class="fas fa-chart-pie text-primary me-2"></i> วิเคราะห์ & รายงาน</span>
+                            </button>
                         </h2>
                         <div id="collapseAnalysis" class="accordion-collapse collapse" data-bs-parent="#analysis-menu">
                             <div class="accordion-body">
                                 <a href="#" onclick="switchTab('tou')" id="tab-tou"><i class="fas fa-angle-right me-2 text-muted"></i> TOU Analysis</a>
                                 <a href="#" onclick="switchTab('compare')" id="tab-compare"><i class="fas fa-angle-right me-2 text-muted"></i> เปรียบเทียบย้อนหลัง</a>
-                                <a href="#" onclick="switchTab('report')" id="tab-report"><i class="fas fa-angle-right me-2 text-muted"></i> ตารางข้อมูล/แก้ไข</a>
+                                <a href="#" onclick="switchTab('report')" id="tab-report"><i class="fas fa-angle-right me-2 text-muted"></i> ตารางข้อมูลดิบ/แก้ไข</a>
                             </div>
                         </div>
                     </div>
                 </div>
-                <a href="#" onclick="location.reload()" class="nav-link-main text-danger mt-auto border-top border-secondary"><i class="fas fa-sign-out-alt me-2"></i> ออกจากระบบ</a>
+
+                <a href="#" onclick="location.reload()" class="nav-link-main text-danger mt-auto border-top border-secondary shadow-none">
+                    <i class="fas fa-sign-out-alt me-2"></i> ออกจากระบบ
+                </a>
             </div>
         </div>
 
         <div class="col-md-10 px-4 main-content-area">
             
             <div id="view-dashboard" class="view-section" style="display: block;">
+                
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-                    <h4 class="fw-bold m-0"><i class="fas fa-tachometer-alt text-primary me-2"></i> Dashboard แนวโน้มประจำปี</h4>
+                    <h4 class="fw-bold m-0"><i class="fas fa-tachometer-alt text-primary me-2"></i> Executive Dashboard</h4>
                     <div class="d-flex align-items-center bg-white px-3 py-2 rounded shadow-sm border">
                         <i class="fas fa-calendar-alt text-muted me-2"></i>
-                        <label class="me-2 mb-0 fw-bold text-muted small d-none d-sm-inline">ปี พ.ศ.</label>
+                        <label class="me-2 mb-0 fw-bold text-muted small d-none d-sm-inline">เลือกปี พ.ศ.</label>
                         <select id="dashYearFilter" class="form-select form-select-sm w-auto border-0 fw-bold text-primary shadow-none"></select>
-                        <button class="btn btn-sm btn-primary ms-2 fw-bold shadow-sm" onclick="loadDashboard()"><i class="fas fa-search"></i> <span class="d-none d-sm-inline">เรียกดู</span></button>
+                        <button class="btn btn-sm btn-primary ms-2 fw-bold shadow-sm" onclick="loadDashboard()">
+                            <i class="fas fa-search"></i> <span class="d-none d-sm-inline">เรียกดู</span>
+                        </button>
                     </div>
                 </div>
 
+                <div class="row mb-4">
+                    <div class="col-lg-6 mb-4 mb-lg-0">
+                        <div class="card dash-card shadow-sm p-4 h-100">
+                            <h6 class="fw-bold text-muted mb-3"><i class="fas fa-coins text-warning me-2"></i> แนวโน้มค่าใช้จ่ายสาธารณูปโภค (บาท)</h6>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="cUtility"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-lg-6">
+                        <div class="card dash-card shadow-sm p-4 h-100">
+                            <h6 class="fw-bold text-muted mb-3"><i class="fas fa-recycle text-success me-2"></i> แนวโน้มปริมาณขยะ (กิโลกรัม)</h6>
+                            <div style="position: relative; height: 300px; width: 100%;">
+                                <canvas id="cWaste"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <h5 class="fw-bold mb-3 mt-2"><i class="fas fa-microscope text-primary"></i> ข้อมูลตรวจวิเคราะห์คุณภาพน้ำ (ล่าสุดของปี)</h5>
                 <div class="row">
-                    <div class="col-lg-4 col-md-6 mb-4"><div class="card p-3 shadow-sm border-0 h-100"><h6 class="fw-bold"><i class="fas fa-bolt text-warning"></i> Trend ค่าไฟฟ้ารวม (บาท)</h6><div style="position: relative; height: 220px; width: 100%;"><canvas id="cElec"></canvas></div></div></div>
-                    <div class="col-lg-4 col-md-6 mb-4"><div class="card p-3 shadow-sm border-0 h-100"><h6 class="fw-bold"><i class="fas fa-tint text-info"></i> Trend ค่าน้ำประปา (บาท)</h6><div style="position: relative; height: 220px; width: 100%;"><canvas id="cWater"></canvas></div></div></div>
-                    <div class="col-lg-4 col-md-6 mb-4"><div class="card p-3 shadow-sm border-0 h-100"><h6 class="fw-bold"><i class="fas fa-gas-pump text-danger"></i> Trend น้ำมันเชื้อเพลิง (บาท)</h6><div style="position: relative; height: 220px; width: 100%;"><canvas id="cFuel"></canvas></div></div></div>
-                    <div class="col-lg-4 col-md-6 mb-4"><div class="card p-3 shadow-sm border-0 h-100"><h6 class="fw-bold"><i class="fas fa-recycle text-success"></i> Trend ขยะรีไซเคิลรวม (กก.)</h6><div style="position: relative; height: 220px; width: 100%;"><canvas id="cRecycle"></canvas></div></div></div>
-                    <div class="col-lg-4 col-md-6 mb-4"><div class="card p-3 shadow-sm border-0 h-100"><h6 class="fw-bold"><i class="fas fa-trash-alt text-secondary"></i> Trend ขยะทั่วไป (กก.)</h6><div style="position: relative; height: 220px; width: 100%;"><canvas id="cGenWaste"></canvas></div></div></div>
-                    <div class="col-lg-4 col-md-6 mb-4"><div class="card p-3 shadow-sm border-0 h-100"><h6 class="fw-bold"><i class="fas fa-biohazard text-danger"></i> Trend ขยะติดเชื้อ (กก.)</h6><div style="position: relative; height: 220px; width: 100%;"><canvas id="cInfectious"></canvas></div></div></div>
+                    
+                    <div class="col-lg-6 mb-4">
+                        <div class="card dash-card dash-card-clickable shadow-sm p-4 h-100 border-start border-primary border-4" 
+                             onclick="switchTab('report'); loadTable('WaterQuality_Logs')">
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="fw-bold text-primary mb-0"><i class="fas fa-vial me-2"></i> คุณภาพน้ำใช้ (Potable Water)</h6>
+                                    <small id="dash-wq-date" class="text-muted">กำลังดึงข้อมูล...</small>
+                                </div>
+                                <span class="badge bg-primary rounded-pill"><i class="fas fa-search"></i> ดูตาราง</span>
+                            </div>
+                            
+                            <div id="wq-chart-container" style="position: relative; height: 200px; width: 100%;">
+                                <canvas id="cWaterQuality"></canvas>
+                            </div>
+                            <div id="wq-empty" class="text-center text-muted py-4" style="display:none;">ไม่มีข้อมูลการตรวจในปีที่เลือก</div>
+                            
+                        </div>
+                    </div>
+
+                    <div class="col-lg-6 mb-4">
+                        <div class="card dash-card dash-card-clickable shadow-sm p-4 h-100 border-start border-info border-4" 
+                             onclick="switchTab('report'); loadTable('Wastewater_Logs')">
+                            
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div>
+                                    <h6 class="fw-bold text-info mb-0"><i class="fas fa-water me-2"></i> น้ำเสีย (บ่อสัมผัสคลอรีน)</h6>
+                                    <small id="dash-ww-date" class="text-muted">กำลังดึงข้อมูล...</small>
+                                </div>
+                                <span class="badge bg-info text-dark rounded-pill"><i class="fas fa-search"></i> ดูตาราง</span>
+                            </div>
+                            
+                            <div id="ww-chart-container" style="position: relative; height: 250px; width: 100%;">
+                                <canvas id="cWastewater"></canvas>
+                            </div>
+                            <div id="ww-empty" class="text-center text-muted py-4" style="display:none;">ไม่มีข้อมูลการตรวจในปีที่เลือก</div>
+                            
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -190,14 +341,17 @@
                             <div class="col-md-6 mb-3 mb-md-0"><label class="form-label fw-bold">ประจำเดือน</label><select name="month" class="form-select month-sel" required></select></div>
                             <div class="col-md-6"><label class="form-label fw-bold">ปี พ.ศ.</label><select name="year" class="form-select year-sel" required></select></div>
                         </div>
+                        
                         <div class="row border p-3 bg-light rounded mb-3">
-                            <h6 class="fw-bold text-primary mb-3">1. ข้อมูลบิลหลักจาก กฟภ. (TOU)</h6>
+                            <h6 class="fw-bold text-primary mb-3">1. ข้อมูลบิลหลักจาก กฟภ.</h6>
                             <div class="col-md-4 mb-3"><label class="small text-muted">On-Peak (หน่วย)</label><input type="number" step="0.01" id="eOn" class="form-control border-warning" oninput="calcE()"></div>
                             <div class="col-md-4 mb-3"><label class="small text-muted">Off-Peak (หน่วย)</label><input type="number" step="0.01" id="eOff" class="form-control border-secondary" oninput="calcE()"></div>
                             <div class="col-md-4 mb-3"><label class="small text-muted">Holiday (หน่วย)</label><input type="number" step="0.01" id="eHol" class="form-control border-info" oninput="calcE()"></div>
+                            
                             <div class="col-md-6 mb-3 mb-md-0"><label class="small fw-bold">หน่วยไฟฟ้ารวมทั้ง รพ. (ระบบคำนวณ)</label><input type="number" step="0.01" id="eTU" class="form-control calc-readonly text-primary fw-bold" readonly required></div>
                             <div class="col-md-6"><label class="small fw-bold text-danger">ยอดเงินรวมทั้งบิล (บาท)</label><input type="number" step="0.01" id="eTP" class="form-control text-danger fw-bold" required oninput="calcE()"></div>
                         </div>
+
                         <div class="row g-0">
                             <div class="col-md-6 p-3 border rounded-start-md">
                                 <h6 class="small fw-bold text-warning mb-3">2. โซนบ้านพัก (สำหรับหักลบ)</h6>
@@ -211,7 +365,8 @@
                                 <input type="number" id="eSP" class="form-control calc-readonly" readonly placeholder="ระบบคำนวณให้อัตโนมัติ">
                             </div>
                         </div>
-                        <button type="submit" id="btn-save-elec" class="btn btn-primary mt-4 w-100 fw-bold shadow-sm">บันทึกข้อมูลค่าไฟ</button>
+                        
+                        <button type="submit" id="btn-save-elec" class="btn btn-primary mt-4 w-100 fw-bold shadow-sm">บันทึกข้อมูลค่าไฟฟ้า</button>
                     </form>
                 </div>
             </div>
@@ -224,11 +379,13 @@
                             <div class="col-md-6 mb-3 mb-md-0"><label class="form-label fw-bold">ประจำเดือน</label><select name="month" class="form-select month-sel" required></select></div>
                             <div class="col-md-6"><label class="form-label fw-bold">ปี พ.ศ.</label><select name="year" class="form-select year-sel" required></select></div>
                         </div>
+
                         <div class="row border p-3 bg-light rounded mb-3">
                             <h6 class="fw-bold text-info mb-3">1. ข้อมูลบิลหลักค่าน้ำประปา</h6>
                             <div class="col-md-6 mb-3 mb-md-0"><label class="small fw-bold">ปริมาณใช้น้ำรวม (หน่วย/ลบ.ม.)</label><input type="number" step="0.01" id="wTU" class="form-control text-primary fw-bold" required oninput="calcW()"></div>
                             <div class="col-md-6"><label class="small fw-bold text-danger">ยอดเงินรวมทั้งบิล (บาท)</label><input type="number" step="0.01" id="wTP" class="form-control text-danger fw-bold" required oninput="calcW()"></div>
                         </div>
+
                         <div class="row g-0">
                             <div class="col-md-6 p-3 border rounded-start-md">
                                 <h6 class="small fw-bold text-warning mb-3">2. โซนบ้านพัก (สำหรับหักลบ)</h6>
@@ -242,6 +399,7 @@
                                 <input type="number" id="wSP" class="form-control calc-readonly" readonly placeholder="ระบบคำนวณให้อัตโนมัติ">
                             </div>
                         </div>
+                        
                         <button type="submit" id="btn-save-water" class="btn btn-info text-white mt-4 w-100 fw-bold shadow-sm">บันทึกข้อมูลค่าน้ำ</button>
                     </form>
                 </div>
@@ -255,17 +413,23 @@
                             <div class="col-md-6 mb-3 mb-md-0"><label class="fw-bold">ประจำเดือน</label><select name="month" class="form-select month-sel" required></select></div>
                             <div class="col-md-6"><label class="fw-bold">ปี พ.ศ.</label><select name="year" class="form-select year-sel" required></select></div>
                         </div>
+                        
                         <h6 class="fw-bold text-primary border-bottom pb-2 mb-3">1. กลุ่มน้ำมันดีเซล (Diesel)</h6>
                         <div class="row mb-3">
                             <div class="col-md-4 mb-3 mb-md-0"><label class="small fw-bold text-muted">ยานพาหนะ (รถยนต์)</label><input type="number" step="0.01" id="f_dc_l" class="form-control mb-2 f-l-val" placeholder="ปริมาณ (ลิตร)"><input type="number" step="0.01" id="f_dc_b" class="form-control f-b-val" placeholder="จำนวนเงิน (บาท)"></div>
                             <div class="col-md-4 mb-3 mb-md-0"><label class="small fw-bold text-muted">เครื่องกำเนิดไฟฟ้า (Gen)</label><input type="number" step="0.01" id="f_dg_l" class="form-control mb-2 f-l-val" placeholder="ปริมาณ (ลิตร)"><input type="number" step="0.01" id="f_dg_b" class="form-control f-b-val" placeholder="จำนวนเงิน (บาท)"></div>
                             <div class="col-md-4"><label class="small fw-bold text-muted">อื่นๆ (ระบุเป็นดีเซล)</label><input type="number" step="0.01" id="f_do_l" class="form-control mb-2 f-l-val" placeholder="ปริมาณ (ลิตร)"><input type="number" step="0.01" id="f_do_b" class="form-control f-b-val" placeholder="จำนวนเงิน (บาท)"></div>
                         </div>
+
                         <h6 class="fw-bold text-warning border-bottom pb-2 mb-3 mt-4">2. กลุ่มน้ำมันเบนซิน (Benzene)</h6>
                         <div class="row mb-4">
                             <div class="col-md-4 mb-3 mb-md-0"><label class="small fw-bold text-muted">เครื่องมือทางการเกษตร</label><input type="number" step="0.01" id="f_ba_l" class="form-control mb-2 f-l-val" placeholder="ปริมาณ (ลิตร)"><input type="number" step="0.01" id="f_ba_b" class="form-control f-b-val" placeholder="จำนวนเงิน (บาท)"></div>
                             <div class="col-md-4 mb-3 mb-md-0"><label class="small fw-bold text-muted">อื่นๆ (ระบุเป็นเบนซิน)</label><input type="number" step="0.01" id="f_bo_l" class="form-control mb-2 f-l-val" placeholder="ปริมาณ (ลิตร)"><input type="number" step="0.01" id="f_bo_b" class="form-control f-b-val" placeholder="จำนวนเงิน (บาท)"></div>
-                            <div class="col-md-4 bg-light p-3 rounded border"><label class="fw-bold text-danger mb-2">สรุปยอดรวมทั้งหมด</label><div class="input-group mb-2"><span class="input-group-text fw-bold w-50">รวม (ลิตร)</span><input type="number" id="f_tot_l" class="form-control calc-readonly" readonly value="0"></div><div class="input-group"><span class="input-group-text fw-bold w-50">รวม (บาท)</span><input type="number" id="f_tot_b" class="form-control calc-readonly" readonly value="0"></div></div>
+                            <div class="col-md-4 bg-light p-3 rounded border">
+                                <label class="fw-bold text-danger mb-2">สรุปยอดรวมทั้งหมด</label>
+                                <div class="input-group mb-2"><span class="input-group-text fw-bold w-50">รวม (ลิตร)</span><input type="number" id="f_tot_l" class="form-control calc-readonly" readonly value="0"></div>
+                                <div class="input-group"><span class="input-group-text fw-bold w-50">รวม (บาท)</span><input type="number" id="f_tot_b" class="form-control calc-readonly" readonly value="0"></div>
+                            </div>
                         </div>
                         <button type="submit" id="btn-save-fuel" class="btn btn-danger w-100 fw-bold shadow-sm">บันทึกข้อมูลน้ำมันเชื้อเพลิง</button>
                     </form>
@@ -277,8 +441,8 @@
                 <div class="card p-4 border-0 shadow-sm" style="max-width: 500px;">
                     <form onsubmit="saveData(event, 'GeneralWaste_Logs', 'general-waste')">
                         <div class="row mb-3">
-                            <div class="col-6"><label class="small text-muted">เดือน</label><select name="month" class="form-select month-sel" required></select></div>
-                            <div class="col-6"><label class="small text-muted">ปี พ.ศ.</label><select name="year" class="form-select year-sel" required></select></div>
+                            <div class="col-6"><select name="month" class="form-select month-sel" required></select></div>
+                            <div class="col-6"><select name="year" class="form-select year-sel" required></select></div>
                         </div>
                         <label class="small fw-bold mb-1">ปริมาณขยะทั่วไปรวม (กก.)</label>
                         <input type="number" step="0.01" name="w" class="form-control form-control-lg mb-4" required>
@@ -295,26 +459,31 @@
                             <div class="col-md-6 mb-2 mb-md-0"><label class="small text-muted">เดือน</label><select name="month" class="form-select month-sel" required></select></div>
                             <div class="col-md-6"><label class="small text-muted">ปี พ.ศ.</label><select name="year" class="form-select year-sel" required></select></div>
                         </div>
+                        
                         <div class="row mb-3">
                             <div class="col-md-4 mb-2"><label class="small text-success fw-bold">กระดาษอ่อน+สี</label><input type="number" step="0.01" name="r1" class="form-control r-val" value="0"></div>
                             <div class="col-md-4 mb-2"><label class="small text-success fw-bold">กระดาษแข็ง</label><input type="number" step="0.01" name="r2" class="form-control r-val" value="0"></div>
                             <div class="col-md-4"><label class="small text-success fw-bold">กระดาษขาว-ดำ</label><input type="number" step="0.01" name="r3" class="form-control r-val" value="0"></div>
                         </div>
+                        
                         <div class="row mb-3">
                             <div class="col-md-4 mb-2"><label class="small text-info fw-bold">ขวดน้ำใส</label><input type="number" step="0.01" name="r5" class="form-control r-val" value="0"></div>
                             <div class="col-md-4 mb-2"><label class="small text-info fw-bold">พลาสติกรวม</label><input type="number" step="0.01" name="r6" class="form-control r-val" value="0"></div>
                             <div class="col-md-4"><label class="small text-secondary fw-bold">อลูมิเนียม</label><input type="number" step="0.01" name="r4" class="form-control r-val" value="0"></div>
                         </div>
+                        
                         <div class="row mb-3">
                             <div class="col-md-4 mb-2"><label class="small text-secondary fw-bold">เหล็กรวม</label><input type="number" step="0.01" name="r7" class="form-control r-val" value="0"></div>
                             <div class="col-md-4 mb-2"><label class="small text-secondary fw-bold">โลป๋อง</label><input type="number" step="0.01" name="r8" class="form-control r-val" value="0"></div>
                             <div class="col-md-4"><label class="small text-secondary fw-bold">กระป๋องสังกะสี</label><input type="number" step="0.01" name="r9" class="form-control r-val" value="0"></div>
                         </div>
+                        
                         <div class="row mb-4">
                             <div class="col-md-4 mb-2"><label class="small text-secondary fw-bold">ขวดแก้วรวม</label><input type="number" step="0.01" name="r10" class="form-control r-val" value="0"></div>
                             <div class="col-md-4 mb-2"><label class="small fw-bold text-primary">อื่นๆ (ระบุไม่ได้)</label><input type="number" step="0.01" name="r11" class="form-control r-val" value="0"></div>
                             <div class="col-md-4"><label class="small fw-bold text-success">ยอดรวมรีไซเคิล (กก.)</label><input type="number" id="rTotal" class="form-control calc-readonly" readonly value="0"></div>
                         </div>
+                        
                         <button type="submit" id="btn-save-recycle" class="btn btn-success w-100 fw-bold shadow-sm">บันทึกข้อมูลขยะรีไซเคิล</button>
                     </form>
                 </div>
@@ -325,8 +494,8 @@
                 <div class="card p-4 border-0 shadow-sm border-danger border-opacity-25" style="max-width: 500px;">
                     <form onsubmit="saveData(event, 'Infectious_Logs', 'infectious')">
                         <div class="row mb-3">
-                            <div class="col-6"><label class="small text-muted">เดือน</label><select name="month" class="form-select month-sel" required></select></div>
-                            <div class="col-6"><label class="small text-muted">ปี พ.ศ.</label><select name="year" class="form-select year-sel" required></select></div>
+                            <div class="col-6"><select name="month" class="form-select month-sel" required></select></div>
+                            <div class="col-6"><select name="year" class="form-select year-sel" required></select></div>
                         </div>
                         <label class="small fw-bold text-danger mb-1">ปริมาณขยะติดเชื้อรวม (กก.)</label>
                         <input type="number" step="0.01" name="w" class="form-control form-control-lg text-danger mb-4" required>
@@ -336,7 +505,7 @@
             </div>
 
             <div id="view-water-quality" class="view-section">
-                <h4 class="mb-4 fw-bold text-primary"><i class="fas fa-vial me-2"></i> บันทึกผลตรวจคุณภาพน้ำใช้</h4>
+                <h4 class="mb-4 fw-bold text-primary"><i class="fas fa-vial me-2"></i> บันทึกผลตรวจคุณภาพน้ำใช้ (Potable Water)</h4>
                 <div class="card p-4 border-0 shadow-sm" style="max-width: 900px;">
                     <form onsubmit="saveData(event, 'WaterQuality_Logs', 'water-quality')">
                         <div class="mb-4" style="max-width: 300px;">
@@ -395,20 +564,53 @@
                         
                         <h6 class="fw-bold text-muted border-bottom pb-2 mb-3">พารามิเตอร์น้ำทิ้ง (ใส่ค่า หรือติ๊ก ND = 0)</h6>
                         <div class="row mb-3">
-                            <div class="col-md-4 mb-3"><label class="small fw-bold">BOD (<= 20 mg/l)</label><div class="input-group"><input type="number" step="0.01" id="ww_bod" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_bod', this)"><label class="ms-1 mb-0 small">ND</label></div></div></div>
-                            <div class="col-md-4 mb-3"><label class="small fw-bold">COD (<= 120 mg/l)</label><div class="input-group"><input type="number" step="0.01" id="ww_cod" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_cod', this)"><label class="ms-1 mb-0 small">ND</label></div></div></div>
-                            <div class="col-md-4 mb-3"><label class="small fw-bold">TDS (<= 1000 mg/l)</label><div class="input-group"><input type="number" step="0.01" id="ww_tds" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_tds', this)"><label class="ms-1 mb-0 small">ND</label></div></div></div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">BOD (&lt;= 20 mg/l)</label>
+                                <div class="input-group"><input type="number" step="0.01" id="ww_bod" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_bod', this)"><label class="ms-1 mb-0 small">ND</label></div></div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">COD (&lt;= 120 mg/l)</label>
+                                <div class="input-group"><input type="number" step="0.01" id="ww_cod" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_cod', this)"><label class="ms-1 mb-0 small">ND</label></div></div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">TDS (&lt;= 1000 mg/l)</label>
+                                <div class="input-group"><input type="number" step="0.01" id="ww_tds" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_tds', this)"><label class="ms-1 mb-0 small">ND</label></div></div>
+                            </div>
                             
-                            <div class="col-md-4 mb-3"><label class="small fw-bold">SS (<= 30 mg/l)</label><div class="input-group"><input type="number" step="0.01" id="ww_ss" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_ss', this)"><label class="ms-1 mb-0 small">ND</label></div></div></div>
-                            <div class="col-md-4 mb-3"><label class="small fw-bold">TKN (<= 35 mg/l)</label><div class="input-group"><input type="number" step="0.01" id="ww_tkn" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_tkn', this)"><label class="ms-1 mb-0 small">ND</label></div></div></div>
-                            <div class="col-md-4 mb-3"><label class="small fw-bold">pH (5 - 9)</label><input type="number" step="0.01" id="ww_ph" class="form-control"></div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">SS (&lt;= 30 mg/l)</label>
+                                <div class="input-group"><input type="number" step="0.01" id="ww_ss" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_ss', this)"><label class="ms-1 mb-0 small">ND</label></div></div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">TKN (&lt;= 35 mg/l)</label>
+                                <div class="input-group"><input type="number" step="0.01" id="ww_tkn" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_tkn', this)"><label class="ms-1 mb-0 small">ND</label></div></div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">pH (5 - 9)</label>
+                                <input type="number" step="0.01" id="ww_ph" class="form-control">
+                            </div>
                             
-                            <div class="col-md-4 mb-3"><label class="small fw-bold">Sulphide (<= 1.0 mg/l)</label><div class="input-group"><input type="number" step="0.01" id="ww_sul" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_sul', this)"><label class="ms-1 mb-0 small">ND</label></div></div></div>
-                            <div class="col-md-4 mb-3"><label class="small fw-bold">Free Chlorine (<= 1.0 mg/L)</label><div class="input-group"><input type="number" step="0.01" id="ww_fcl" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_fcl', this)"><label class="ms-1 mb-0 small">ND</label></div></div></div>
-                            <div class="col-md-4 mb-3"><label class="small fw-bold">Oil & Grease (<= 20 mg/l)</label><div class="input-group"><input type="number" step="0.01" id="ww_oil" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_oil', this)"><label class="ms-1 mb-0 small">ND</label></div></div></div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">Sulphide (&lt;= 1.0 mg/l)</label>
+                                <div class="input-group"><input type="number" step="0.01" id="ww_sul" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_sul', this)"><label class="ms-1 mb-0 small">ND</label></div></div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold">Free Chlorine (&lt;= 1.0 mg/L)</label>
+                                <div class="input-group"><input type="number" step="0.01" id="ww_fcl" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_fcl', this)"><label class="ms-1 mb-0 small">ND</label></div></div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label class="small fw-bold text-secondary">Oil & Grease (&lt;= 20 mg/l)</label>
+                                <div class="input-group"><input type="number" step="0.01" id="ww_oil" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_oil', this)"><label class="ms-1 mb-0 small">ND</label></div></div>
+                            </div>
                             
-                            <div class="col-md-6 mb-3"><label class="small fw-bold text-warning">Total Coliform (<= 5,000 MPN/100ml)</label><div class="input-group"><input type="number" step="0.01" id="ww_tcoli" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_tcoli', this)"><label class="ms-1 mb-0 small">ND</label></div></div></div>
-                            <div class="col-md-6 mb-3"><label class="small fw-bold text-danger">Fecal Coliform (<= 1,000 MPN/100ml)</label><div class="input-group"><input type="number" step="0.01" id="ww_fcoli" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_fcoli', this)"><label class="ms-1 mb-0 small">ND</label></div></div></div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold text-warning">Total Coliform (&lt;= 5,000 MPN/100ml)</label>
+                                <div class="input-group"><input type="number" step="0.01" id="ww_tcoli" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_tcoli', this)"><label class="ms-1 mb-0 small">ND</label></div></div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="small fw-bold text-danger">Fecal Coliform (&lt;= 1,000 MPN/100ml)</label>
+                                <div class="input-group"><input type="number" step="0.01" id="ww_fcoli" class="form-control"><div class="input-group-text"><input type="checkbox" class="form-check-input mt-0" onchange="toggleND('ww_fcoli', this)"><label class="ms-1 mb-0 small">ND</label></div></div>
+                            </div>
                         </div>
                         <button type="submit" id="btn-save-wastewater" class="btn btn-info text-white w-100 fw-bold shadow-sm">บันทึกคุณภาพน้ำเสีย</button>
                     </form>
@@ -419,13 +621,33 @@
                 <h4 class="mb-4 fw-bold text-primary"><i class="fas fa-microchip me-2"></i> วิเคราะห์พฤติกรรมการใช้ไฟฟ้า (TOU)</h4>
                 <div class="card p-4 border-0 shadow-sm mb-4">
                     <div class="row align-items-end">
-                        <div class="col-md-4 mb-3 mb-md-0"><label class="small text-muted">เลือกปี พ.ศ. ที่ต้องการวิเคราะห์</label><select id="touY" class="form-select year-sel"></select></div>
-                        <div class="col-md-3"><button class="btn btn-primary w-100 fw-bold shadow-sm" id="btn-tou" onclick="genTOU()"><i class="fas fa-search me-2"></i> ประมวลผล</button></div>
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <label class="small text-muted">เลือกปี พ.ศ. ที่ต้องการวิเคราะห์</label>
+                            <select id="touY" class="form-select year-sel"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-primary w-100 fw-bold shadow-sm" id="btn-tou" onclick="genTOU()">
+                                <i class="fas fa-search me-2"></i> ประมวลผล
+                            </button>
+                        </div>
                     </div>
                 </div>
+                
                 <div class="row" id="tou-result" style="display:none;">
-                    <div class="col-md-6 mb-4"><div class="card p-3 border-0 shadow-sm text-center h-100"><h6 class="fw-bold">สัดส่วนหน่วย On-Peak / Off-Peak / Holiday</h6><div style="position: relative; height:250px; width: 100%;"><canvas id="touPie"></canvas></div></div></div>
-                    <div class="col-md-6 mb-4"><div class="card p-4 border-0 shadow-sm h-100"><h6 class="fw-bold">สรุปข้อมูลเชิงลึก (Insights)</h6><div id="tou-text" class="mt-3"></div></div></div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card p-3 border-0 shadow-sm text-center h-100">
+                            <h6 class="fw-bold">สัดส่วนหน่วย On-Peak / Off-Peak / Holiday</h6>
+                            <div style="position: relative; height:250px; width: 100%;">
+                                <canvas id="touPie"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4">
+                        <div class="card p-4 border-0 shadow-sm h-100">
+                            <h6 class="fw-bold">สรุปข้อมูลเชิงลึก (Insights)</h6>
+                            <div id="tou-text" class="mt-3"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -444,14 +666,33 @@
                                 <option value="Infectious_Logs">ขยะติดเชื้อ (กก.)</option>
                             </select>
                         </div>
-                        <div class="col-md-2 mb-3 mb-md-0"><label class="small text-muted">ปีที่ 1 (ปีฐาน)</label><select id="cY1" class="form-select year-sel"></select></div>
-                        <div class="col-md-2 mb-3 mb-md-0"><label class="small text-muted">ปีที่ 2</label><select id="cY2" class="form-select year-sel"></select></div>
-                        <div class="col-md-2 mb-3 mb-md-0"><label class="small text-muted">ปีที่ 3</label><select id="cY3" class="form-select year-sel"></select></div>
-                        <div class="col-md-3"><button class="btn btn-warning text-dark fw-bold w-100 shadow-sm" id="btn-comp" onclick="genComp()"><i class="fas fa-search me-2"></i> วิเคราะห์</button></div>
+                        <div class="col-md-2 mb-3 mb-md-0">
+                            <label class="small text-muted">ปีที่ 1 (ปีฐาน)</label>
+                            <select id="cY1" class="form-select year-sel"></select>
+                        </div>
+                        <div class="col-md-2 mb-3 mb-md-0">
+                            <label class="small text-muted">ปีที่ 2</label>
+                            <select id="cY2" class="form-select year-sel"></select>
+                        </div>
+                        <div class="col-md-2 mb-3 mb-md-0">
+                            <label class="small text-muted">ปีที่ 3</label>
+                            <select id="cY3" class="form-select year-sel"></select>
+                        </div>
+                        <div class="col-md-3">
+                            <button class="btn btn-warning text-dark fw-bold w-100 shadow-sm" id="btn-comp" onclick="genComp()">
+                                <i class="fas fa-search me-2"></i> วิเคราะห์
+                            </button>
+                        </div>
                     </div>
                 </div>
+                
                 <div id="comp-insight" class="insight-card shadow-sm" style="display:none;"></div>
-                <div class="card p-4 border-0 shadow-sm" id="comp-chart-card" style="display:none;"><div style="position: relative; height: 350px; width: 100%;"><canvas id="compChart"></canvas></div></div>
+                
+                <div class="card p-4 border-0 shadow-sm" id="comp-chart-card" style="display:none;">
+                    <div style="position: relative; height: 350px; width: 100%;">
+                        <canvas id="compChart"></canvas>
+                    </div>
+                </div>
             </div>
 
             <div id="view-report" class="view-section">
@@ -466,53 +707,264 @@
                     <button class="btn btn-outline-primary fw-bold" onclick="loadTable('WaterQuality_Logs')"><i class="fas fa-vial"></i> น้ำใช้</button>
                     <button class="btn btn-outline-info fw-bold" onclick="loadTable('Wastewater_Logs')"><i class="fas fa-water"></i> น้ำเสีย</button>
                 </div>
-                <div class="card p-3 border-0 shadow-sm"><div class="table-responsive"><table id="mainTable" class="table table-hover table-striped w-100 align-middle text-nowrap"></table></div></div>
+                
+                <div class="card p-3 border-0 shadow-sm">
+                    <div class="table-responsive">
+                        <table id="mainTable" class="table table-hover table-striped w-100 align-middle text-nowrap"></table>
+                    </div>
+                </div>
             </div>
             
+        </div> </div>
+</div>
+
+<div class="modal fade" id="regModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title"><i class="fas fa-user-plus"></i> สมัครสมาชิก</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="text" id="rU" class="form-control mb-3" placeholder="Username">
+                <input type="text" id="rN" class="form-control mb-3" placeholder="ชื่อ-นามสกุล">
+                <input type="email" id="rE" class="form-control mb-3" placeholder="Email">
+                <input type="password" id="rP" class="form-control mb-3" placeholder="Password">
+                <div class="form-check small text-muted"><input class="form-check-input" type="checkbox" id="pdpa"><label class="form-check-label">ยินยอม PDPA</label></div>
+                <button class="btn btn-primary w-100 mt-4 fw-bold" onclick="register()">ลงทะเบียน</button>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="regModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content border-0 shadow"><div class="modal-header bg-primary text-white"><h5 class="modal-title">สมัครสมาชิก</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-4"><input type="text" id="rU" class="form-control mb-3" placeholder="Username"><input type="text" id="rN" class="form-control mb-3" placeholder="ชื่อ-นามสกุล"><input type="email" id="rE" class="form-control mb-3" placeholder="Email"><input type="password" id="rP" class="form-control mb-3" placeholder="Password"><div class="form-check small text-muted"><input class="form-check-input" type="checkbox" id="pdpa"><label class="form-check-label">ยินยอม PDPA</label></div><button class="btn btn-primary w-100 mt-4 fw-bold" onclick="register()">ลงทะเบียน</button></div></div></div></div>
-<div class="modal fade" id="forgotModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content border-0 shadow"><div class="modal-header bg-danger text-white"><h5 class="modal-title">ลืมรหัสผ่าน</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button></div><div class="modal-body p-4"><input type="email" id="fE" class="form-control mb-4" placeholder="กรอกอีเมลของคุณ"><button class="btn btn-danger w-100 fw-bold" onclick="forgot()">ส่งรหัสผ่านใหม่</button></div></div></div></div>
+<div class="modal fade" id="forgotModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title"><i class="fas fa-key"></i> ลืมรหัสผ่าน</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <input type="email" id="fE" class="form-control mb-4" placeholder="กรอกอีเมลของคุณ">
+                <button class="btn btn-danger w-100 fw-bold" onclick="forgot()">ส่งรหัสผ่านใหม่</button>
+            </div>
+        </div>
+    </div>
+</div>
 
-<div class="modal fade" id="editElecModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content border-0 shadow"><div class="modal-header bg-warning"><h5 class="modal-title fw-bold">แก้ไข: ค่าไฟฟ้า</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4">
-    <form id="editElecForm"><input type="hidden" id="m_e_idx"><input type="hidden" id="m_e_ts"><input type="hidden" id="m_e_m"><input type="hidden" id="m_e_y">
-        <div class="row mb-3"><div class="col-3"><label class="small">On-Peak</label><input type="number" step="0.01" id="m_eOn" class="form-control" oninput="calcModalE()"></div><div class="col-3"><label class="small">Off-Peak</label><input type="number" step="0.01" id="m_eOff" class="form-control" oninput="calcModalE()"></div><div class="col-3"><label class="small">Holiday</label><input type="number" step="0.01" id="m_eHol" class="form-control" oninput="calcModalE()"></div><div class="col-3"><label class="small">เงินรวม</label><input type="number" step="0.01" id="m_eTP" class="form-control" oninput="calcModalE()"></div><div class="col-12 mt-2"><div class="input-group"><span class="input-group-text">หน่วยไฟฟ้ารวม</span><input type="number" step="0.01" id="m_eTU" class="form-control calc-readonly" readonly></div></div></div>
-        <div class="row border-top pt-3"><div class="col-md-6 border-end"><label class="form-label fw-bold text-warning">บ้านพัก</label><input type="number" step="0.01" id="m_eHU" class="form-control mb-2" placeholder="หน่วย" oninput="calcModalE()"><input type="number" step="0.01" id="m_eHUExtra" class="form-control mb-2 border-danger" placeholder="หน่วยเกินสิทธิ"><input type="number" step="0.01" id="m_eHP" class="form-control" placeholder="บาท" oninput="calcModalE()"></div><div class="col-md-6"><label class="form-label fw-bold text-success">บริการ (สุทธิ)</label><input type="number" id="m_eSU" class="form-control mb-2 calc-readonly" readonly><input type="number" id="m_eSP" class="form-control calc-readonly" readonly></div></div>
-    </form></div><div class="modal-footer"><button class="btn btn-primary" onclick="saveEditElec()">บันทึก</button></div></div></div></div>
+<div class="modal fade" id="editElecModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title fw-bold"><i class="fas fa-edit"></i> แก้ไข: ค่าไฟฟ้า</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editElecForm">
+                    <input type="hidden" id="m_e_idx"><input type="hidden" id="m_e_ts"><input type="hidden" id="m_e_m"><input type="hidden" id="m_e_y">
+                    <div class="row mb-3">
+                        <div class="col-3"><label class="small">On-Peak</label><input type="number" step="0.01" id="m_eOn" class="form-control" oninput="calcModalE()"></div>
+                        <div class="col-3"><label class="small">Off-Peak</label><input type="number" step="0.01" id="m_eOff" class="form-control" oninput="calcModalE()"></div>
+                        <div class="col-3"><label class="small">Holiday</label><input type="number" step="0.01" id="m_eHol" class="form-control" oninput="calcModalE()"></div>
+                        <div class="col-3"><label class="small text-danger">เงินรวม</label><input type="number" step="0.01" id="m_eTP" class="form-control border-danger" oninput="calcModalE()"></div>
+                        <div class="col-12 mt-2"><div class="input-group"><span class="input-group-text bg-light">หน่วยรวม</span><input type="number" step="0.01" id="m_eTU" class="form-control calc-readonly" readonly></div></div>
+                    </div>
+                    <div class="row border-top pt-3 mt-3">
+                        <div class="col-md-6 border-end">
+                            <label class="form-label fw-bold text-warning">บ้านพัก</label>
+                            <input type="number" step="0.01" id="m_eHU" class="form-control mb-2" placeholder="หน่วย (รวม)" oninput="calcModalE()">
+                            <input type="number" step="0.01" id="m_eHUExtra" class="form-control mb-2 border-danger" placeholder="หน่วยเกินสิทธิ">
+                            <input type="number" step="0.01" id="m_eHP" class="form-control" placeholder="บาท" oninput="calcModalE()">
+                        </div>
+                        <div class="col-md-6 px-3">
+                            <label class="form-label fw-bold text-success">บริการ (สุทธิ)</label>
+                            <input type="number" id="m_eSU" class="form-control mb-2 calc-readonly" readonly>
+                            <input type="number" id="m_eSP" class="form-control calc-readonly" readonly>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light"><button class="btn btn-primary fw-bold" onclick="saveEditElec()">บันทึกการแก้ไข</button></div>
+        </div>
+    </div>
+</div>
 
-<div class="modal fade" id="editWaterModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content border-0 shadow"><div class="modal-header bg-info text-white"><h5 class="modal-title fw-bold">แก้ไข: ค่าน้ำประปา</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4">
-    <form id="editWaterForm"><input type="hidden" id="m_w_idx"><input type="hidden" id="m_w_ts"><input type="hidden" id="m_w_m"><input type="hidden" id="m_w_y">
-        <div class="row mb-3"><div class="col-6"><label class="small">หน่วยรวม</label><input type="number" step="0.01" id="m_wTU" class="form-control" oninput="calcModalW()"></div><div class="col-6"><label class="small">เงินรวม</label><input type="number" step="0.01" id="m_wTP" class="form-control" oninput="calcModalW()"></div></div>
-        <div class="row border-top pt-3"><div class="col-md-6 border-end"><label class="form-label fw-bold text-warning">บ้านพัก</label><input type="number" step="0.01" id="m_wHU" class="form-control mb-2" placeholder="หน่วย" oninput="calcModalW()"><input type="number" step="0.01" id="m_wHUExtra" class="form-control mb-2 border-danger" placeholder="หน่วยเกินสิทธิ"><input type="number" step="0.01" id="m_wHP" class="form-control" placeholder="บาท" oninput="calcModalW()"></div><div class="col-md-6"><label class="form-label fw-bold text-success">บริการ (สุทธิ)</label><input type="number" id="m_wSU" class="form-control mb-2 calc-readonly" readonly><input type="number" id="m_wSP" class="form-control calc-readonly" readonly></div></div>
-    </form></div><div class="modal-footer"><button class="btn btn-primary" onclick="saveEditWater()">บันทึก</button></div></div></div></div>
+<div class="modal fade" id="editWaterModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-edit"></i> แก้ไข: ค่าน้ำประปา</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editWaterForm">
+                    <input type="hidden" id="m_w_idx"><input type="hidden" id="m_w_ts"><input type="hidden" id="m_w_m"><input type="hidden" id="m_w_y">
+                    <div class="row mb-3">
+                        <div class="col-6"><label class="small">หน่วยรวม (ลบ.ม.)</label><input type="number" step="0.01" id="m_wTU" class="form-control" oninput="calcModalW()"></div>
+                        <div class="col-6"><label class="small text-danger">เงินรวม</label><input type="number" step="0.01" id="m_wTP" class="form-control border-danger" oninput="calcModalW()"></div>
+                    </div>
+                    <div class="row border-top pt-3 mt-3">
+                        <div class="col-md-6 border-end">
+                            <label class="form-label fw-bold text-warning">บ้านพัก</label>
+                            <input type="number" step="0.01" id="m_wHU" class="form-control mb-2" placeholder="หน่วย (รวม)" oninput="calcModalW()">
+                            <input type="number" step="0.01" id="m_wHUExtra" class="form-control mb-2 border-danger" placeholder="หน่วยเกินสิทธิ">
+                            <input type="number" step="0.01" id="m_wHP" class="form-control" placeholder="บาท" oninput="calcModalW()">
+                        </div>
+                        <div class="col-md-6 px-3">
+                            <label class="form-label fw-bold text-success">บริการ (สุทธิ)</label>
+                            <input type="number" id="m_wSU" class="form-control mb-2 calc-readonly" readonly>
+                            <input type="number" id="m_wSP" class="form-control calc-readonly" readonly>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light"><button class="btn btn-primary fw-bold" onclick="saveEditWater()">บันทึกการแก้ไข</button></div>
+        </div>
+    </div>
+</div>
 
-<div class="modal fade" id="editFuelModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content border-0 shadow"><div class="modal-header bg-danger text-white"><h5 class="modal-title fw-bold">แก้ไข: น้ำมันเชื้อเพลิง</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4">
-    <form id="editFuelForm"><input type="hidden" id="m_f_idx"><input type="hidden" id="m_f_ts"><input type="hidden" id="m_f_m"><input type="hidden" id="m_f_y">
-        <div class="row mb-3"><div class="col-4"><label class="small">รถยนต์(L/B)</label><input type="number" step="0.01" id="m_f_dc_l" class="form-control mb-1 m_f_l"><input type="number" step="0.01" id="m_f_dc_b" class="form-control m_f_b"></div><div class="col-4"><label class="small">Gen(L/B)</label><input type="number" step="0.01" id="m_f_dg_l" class="form-control mb-1 m_f_l"><input type="number" step="0.01" id="m_f_dg_b" class="form-control m_f_b"></div><div class="col-4"><label class="small">อื่นๆดีเซล(L/B)</label><input type="number" step="0.01" id="m_f_do_l" class="form-control mb-1 m_f_l"><input type="number" step="0.01" id="m_f_do_b" class="form-control m_f_b"></div></div>
-        <div class="row mb-3 border-top pt-2"><div class="col-4"><label class="small">เกษตร(L/B)</label><input type="number" step="0.01" id="m_f_ba_l" class="form-control mb-1 m_f_l"><input type="number" step="0.01" id="m_f_ba_b" class="form-control m_f_b"></div><div class="col-4"><label class="small">อื่นๆเบนซิน(L/B)</label><input type="number" step="0.01" id="m_f_bo_l" class="form-control mb-1 m_f_l"><input type="number" step="0.01" id="m_f_bo_b" class="form-control m_f_b"></div><div class="col-4"><label class="small text-danger fw-bold">ยอดรวม</label><input type="number" id="m_f_tot_l" class="form-control mb-1 calc-readonly" readonly placeholder="L"><input type="number" id="m_f_tot_b" class="form-control calc-readonly" readonly placeholder="B"></div></div>
-    </form></div><div class="modal-footer"><button class="btn btn-primary" onclick="saveEditFuel()">บันทึก</button></div></div></div></div>
+<div class="modal fade" id="editFuelModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-edit"></i> แก้ไข: น้ำมันเชื้อเพลิง</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editFuelForm">
+                    <input type="hidden" id="m_f_idx"><input type="hidden" id="m_f_ts"><input type="hidden" id="m_f_m"><input type="hidden" id="m_f_y">
+                    <div class="row mb-3">
+                        <div class="col-4"><label class="small">รถยนต์(L/B)</label><input type="number" step="0.01" id="m_f_dc_l" class="form-control mb-1 m_f_l"><input type="number" step="0.01" id="m_f_dc_b" class="form-control m_f_b"></div>
+                        <div class="col-4"><label class="small">Gen(L/B)</label><input type="number" step="0.01" id="m_f_dg_l" class="form-control mb-1 m_f_l"><input type="number" step="0.01" id="m_f_dg_b" class="form-control m_f_b"></div>
+                        <div class="col-4"><label class="small">อื่นๆดีเซล(L/B)</label><input type="number" step="0.01" id="m_f_do_l" class="form-control mb-1 m_f_l"><input type="number" step="0.01" id="m_f_do_b" class="form-control m_f_b"></div>
+                    </div>
+                    <div class="row mb-3 border-top pt-3">
+                        <div class="col-4"><label class="small">เกษตร(L/B)</label><input type="number" step="0.01" id="m_f_ba_l" class="form-control mb-1 m_f_l"><input type="number" step="0.01" id="m_f_ba_b" class="form-control m_f_b"></div>
+                        <div class="col-4"><label class="small">อื่นๆเบนซิน(L/B)</label><input type="number" step="0.01" id="m_f_bo_l" class="form-control mb-1 m_f_l"><input type="number" step="0.01" id="m_f_bo_b" class="form-control m_f_b"></div>
+                        <div class="col-4 bg-light p-2 rounded">
+                            <label class="small text-danger fw-bold">ยอดรวม</label>
+                            <input type="number" id="m_f_tot_l" class="form-control mb-1 calc-readonly" readonly placeholder="L">
+                            <input type="number" id="m_f_tot_b" class="form-control calc-readonly" readonly placeholder="B">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light"><button class="btn btn-primary fw-bold" onclick="saveEditFuel()">บันทึกการแก้ไข</button></div>
+        </div>
+    </div>
+</div>
 
-<div class="modal fade" id="editRecycleModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content border-0 shadow"><div class="modal-header bg-success text-white"><h5 class="modal-title fw-bold">แก้ไข: ขยะรีไซเคิล</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4">
-    <form id="editRecycleForm"><input type="hidden" id="m_r_idx"><input type="hidden" id="m_r_ts"><input type="hidden" id="m_r_m"><input type="hidden" id="m_r_y">
-        <div class="row"><div class="col-4 mb-2"><label class="small">กระดาษอ่อน</label><input type="number" step="0.01" id="m_r1" class="form-control m_r_val"></div><div class="col-4 mb-2"><label class="small">กระดาษแข็ง</label><input type="number" step="0.01" id="m_r2" class="form-control m_r_val"></div><div class="col-4 mb-2"><label class="small">ขาวดำ</label><input type="number" step="0.01" id="m_r3" class="form-control m_r_val"></div><div class="col-4 mb-2"><label class="small">ขวดใส</label><input type="number" step="0.01" id="m_r5" class="form-control m_r_val"></div><div class="col-4 mb-2"><label class="small">พลาสติก</label><input type="number" step="0.01" id="m_r6" class="form-control m_r_val"></div><div class="col-4 mb-2"><label class="small">อลูมิเนียม</label><input type="number" step="0.01" id="m_r4" class="form-control m_r_val"></div><div class="col-4 mb-2"><label class="small">เหล็ก</label><input type="number" step="0.01" id="m_r7" class="form-control m_r_val"></div><div class="col-4 mb-2"><label class="small">โลป๋อง</label><input type="number" step="0.01" id="m_r8" class="form-control m_r_val"></div><div class="col-4 mb-2"><label class="small">สังกะสี</label><input type="number" step="0.01" id="m_r9" class="form-control m_r_val"></div><div class="col-4 mb-2"><label class="small">ขวดแก้ว</label><input type="number" step="0.01" id="m_r10" class="form-control m_r_val"></div><div class="col-4 mb-2"><label class="small">อื่นๆ</label><input type="number" step="0.01" id="m_r11" class="form-control m_r_val"></div><div class="col-4 mb-2"><label class="small fw-bold">รวม</label><input type="number" id="m_rTot" class="form-control calc-readonly" readonly></div></div>
-    </form></div><div class="modal-footer"><button class="btn btn-primary" onclick="saveEditRecycle()">บันทึก</button></div></div></div></div>
+<div class="modal fade" id="editRecycleModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-edit"></i> แก้ไข: ขยะรีไซเคิล</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editRecycleForm">
+                    <input type="hidden" id="m_r_idx"><input type="hidden" id="m_r_ts"><input type="hidden" id="m_r_m"><input type="hidden" id="m_r_y">
+                    <div class="row">
+                        <div class="col-4 mb-2"><label class="small">กระดาษอ่อน</label><input type="number" step="0.01" id="m_r1" class="form-control m_r_val"></div>
+                        <div class="col-4 mb-2"><label class="small">กระดาษแข็ง</label><input type="number" step="0.01" id="m_r2" class="form-control m_r_val"></div>
+                        <div class="col-4 mb-2"><label class="small">ขาวดำ</label><input type="number" step="0.01" id="m_r3" class="form-control m_r_val"></div>
+                        <div class="col-4 mb-2"><label class="small">ขวดใส</label><input type="number" step="0.01" id="m_r5" class="form-control m_r_val"></div>
+                        <div class="col-4 mb-2"><label class="small">พลาสติก</label><input type="number" step="0.01" id="m_r6" class="form-control m_r_val"></div>
+                        <div class="col-4 mb-2"><label class="small">อลูมิเนียม</label><input type="number" step="0.01" id="m_r4" class="form-control m_r_val"></div>
+                        <div class="col-4 mb-2"><label class="small">เหล็ก</label><input type="number" step="0.01" id="m_r7" class="form-control m_r_val"></div>
+                        <div class="col-4 mb-2"><label class="small">โลป๋อง</label><input type="number" step="0.01" id="m_r8" class="form-control m_r_val"></div>
+                        <div class="col-4 mb-2"><label class="small">สังกะสี</label><input type="number" step="0.01" id="m_r9" class="form-control m_r_val"></div>
+                        <div class="col-4 mb-2"><label class="small">ขวดแก้ว</label><input type="number" step="0.01" id="m_r10" class="form-control m_r_val"></div>
+                        <div class="col-4 mb-2"><label class="small">อื่นๆ</label><input type="number" step="0.01" id="m_r11" class="form-control m_r_val"></div>
+                        <div class="col-4 mb-2"><label class="small fw-bold text-success">รวม</label><input type="number" id="m_rTot" class="form-control calc-readonly" readonly></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light"><button class="btn btn-primary fw-bold" onclick="saveEditRecycle()">บันทึกการแก้ไข</button></div>
+        </div>
+    </div>
+</div>
 
-<div class="modal fade" id="editSingleModal" tabindex="-1"><div class="modal-dialog"><div class="modal-content border-0 shadow"><div class="modal-header bg-secondary text-white"><h5 class="modal-title fw-bold" id="m_s_title">แก้ไข: ขยะ</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4">
-    <form id="editSingleForm"><input type="hidden" id="m_s_sheet"><input type="hidden" id="m_s_idx"><input type="hidden" id="m_s_ts"><input type="hidden" id="m_s_m"><input type="hidden" id="m_s_y"><label class="small fw-bold mb-1">ปริมาณ (กก.)</label><input type="number" step="0.01" id="m_s_w" class="form-control"></form></div><div class="modal-footer"><button class="btn btn-primary" onclick="saveEditSingle()">บันทึก</button></div></div></div></div>
+<div class="modal fade" id="editSingleModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title fw-bold" id="m_s_title">แก้ไขข้อมูล</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editSingleForm">
+                    <input type="hidden" id="m_s_sheet"><input type="hidden" id="m_s_idx"><input type="hidden" id="m_s_ts"><input type="hidden" id="m_s_m"><input type="hidden" id="m_s_y">
+                    <label class="small fw-bold mb-1">ปริมาณ (กก.)</label>
+                    <input type="number" step="0.01" id="m_s_w" class="form-control form-control-lg">
+                </form>
+            </div>
+            <div class="modal-footer bg-light"><button class="btn btn-primary fw-bold" onclick="saveEditSingle()">บันทึกการแก้ไข</button></div>
+        </div>
+    </div>
+</div>
 
-<div class="modal fade" id="editWQModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content border-0 shadow"><div class="modal-header bg-primary text-white"><h5 class="modal-title fw-bold">แก้ไข: คุณภาพน้ำใช้</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4">
-    <form id="editWQForm"><input type="hidden" id="m_wq_idx"><input type="hidden" id="m_wq_ts">
-        <label class="small mb-1">วันที่ตรวจ</label><input type="date" id="m_wq_d" class="form-control mb-3 w-50">
-        <div class="row"><div class="col-4 mb-2"><label class="small">TDS</label><input type="number" step="0.01" id="m_wq_tds" class="form-control"></div><div class="col-4 mb-2"><label class="small">Coliforms</label><input type="number" step="0.01" id="m_wq_coli" class="form-control"></div><div class="col-4 mb-2"><label class="small">Fecal Coli</label><input type="number" step="0.01" id="m_wq_fcoli" class="form-control"></div><div class="col-4 mb-2"><label class="small">Cond</label><input type="number" step="0.01" id="m_wq_cond" class="form-control"></div><div class="col-4 mb-2"><label class="small">pH</label><input type="number" step="0.01" id="m_wq_ph" class="form-control"></div></div>
-    </form></div><div class="modal-footer"><button class="btn btn-primary" onclick="saveEditWQ()">บันทึก</button></div></div></div></div>
+<div class="modal fade" id="editWQModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-edit"></i> แก้ไข: คุณภาพน้ำใช้</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editWQForm">
+                    <input type="hidden" id="m_wq_idx"><input type="hidden" id="m_wq_ts">
+                    <div class="mb-3 w-50">
+                        <label class="small mb-1">วันที่ตรวจ</label>
+                        <input type="date" id="m_wq_d" class="form-control">
+                    </div>
+                    <div class="row">
+                        <div class="col-4 mb-2"><label class="small">TDS (<500)</label><input type="number" step="0.01" id="m_wq_tds" class="form-control"></div>
+                        <div class="col-4 mb-2"><label class="small">Coliforms (<1.1)</label><input type="number" step="0.01" id="m_wq_coli" class="form-control"></div>
+                        <div class="col-4 mb-2"><label class="small">Fecal Coli (=0)</label><input type="number" step="0.01" id="m_wq_fcoli" class="form-control"></div>
+                        <div class="col-4 mb-2"><label class="small">Cond (50-800)</label><input type="number" step="0.01" id="m_wq_cond" class="form-control"></div>
+                        <div class="col-4 mb-2"><label class="small">pH (6.5-8.5)</label><input type="number" step="0.01" id="m_wq_ph" class="form-control"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light"><button class="btn btn-primary fw-bold" onclick="saveEditWQ()">บันทึกการแก้ไข</button></div>
+        </div>
+    </div>
+</div>
 
-<div class="modal fade" id="editWWModal" tabindex="-1"><div class="modal-dialog modal-lg"><div class="modal-content border-0 shadow"><div class="modal-header bg-info text-white"><h5 class="modal-title fw-bold">แก้ไข: น้ำเสีย</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body p-4">
-    <form id="editWWForm"><input type="hidden" id="m_ww_idx"><input type="hidden" id="m_ww_ts">
-        <label class="small mb-1">วันที่ตรวจ</label><input type="date" id="m_ww_d" class="form-control mb-3 w-50">
-        <div class="row"><div class="col-3 mb-2"><label class="small">BOD</label><input type="number" step="0.01" id="m_ww_bod" class="form-control"></div><div class="col-3 mb-2"><label class="small">COD</label><input type="number" step="0.01" id="m_ww_cod" class="form-control"></div><div class="col-3 mb-2"><label class="small">TDS</label><input type="number" step="0.01" id="m_ww_tds" class="form-control"></div><div class="col-3 mb-2"><label class="small">SS</label><input type="number" step="0.01" id="m_ww_ss" class="form-control"></div><div class="col-3 mb-2"><label class="small">TKN</label><input type="number" step="0.01" id="m_ww_tkn" class="form-control"></div><div class="col-3 mb-2"><label class="small">pH</label><input type="number" step="0.01" id="m_ww_ph" class="form-control"></div><div class="col-3 mb-2"><label class="small">Sulphide</label><input type="number" step="0.01" id="m_ww_sul" class="form-control"></div><div class="col-3 mb-2"><label class="small">Free Cl</label><input type="number" step="0.01" id="m_ww_fcl" class="form-control"></div><div class="col-3 mb-2"><label class="small">Oil&Grease</label><input type="number" step="0.01" id="m_ww_oil" class="form-control"></div><div class="col-4 mb-2"><label class="small">Total Coli</label><input type="number" step="0.01" id="m_ww_tcoli" class="form-control"></div><div class="col-4 mb-2"><label class="small">Fecal Coli</label><input type="number" step="0.01" id="m_ww_fcoli" class="form-control"></div></div>
-    </form></div><div class="modal-footer"><button class="btn btn-primary" onclick="saveEditWW()">บันทึก</button></div></div></div></div>
+<div class="modal fade" id="editWWModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content border-0 shadow">
+            <div class="modal-header bg-info text-white">
+                <h5 class="modal-title fw-bold"><i class="fas fa-edit"></i> แก้ไข: คุณภาพน้ำเสีย</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-4">
+                <form id="editWWForm">
+                    <input type="hidden" id="m_ww_idx"><input type="hidden" id="m_ww_ts">
+                    <div class="mb-3 w-50">
+                        <label class="small mb-1">วันที่ตรวจ</label>
+                        <input type="date" id="m_ww_d" class="form-control">
+                    </div>
+                    <div class="row">
+                        <div class="col-3 mb-2"><label class="small">BOD</label><input type="number" step="0.01" id="m_ww_bod" class="form-control"></div>
+                        <div class="col-3 mb-2"><label class="small">COD</label><input type="number" step="0.01" id="m_ww_cod" class="form-control"></div>
+                        <div class="col-3 mb-2"><label class="small">TDS</label><input type="number" step="0.01" id="m_ww_tds" class="form-control"></div>
+                        <div class="col-3 mb-2"><label class="small">SS</label><input type="number" step="0.01" id="m_ww_ss" class="form-control"></div>
+                        <div class="col-3 mb-2"><label class="small">TKN</label><input type="number" step="0.01" id="m_ww_tkn" class="form-control"></div>
+                        <div class="col-3 mb-2"><label class="small">pH</label><input type="number" step="0.01" id="m_ww_ph" class="form-control"></div>
+                        <div class="col-3 mb-2"><label class="small">Sulphide</label><input type="number" step="0.01" id="m_ww_sul" class="form-control"></div>
+                        <div class="col-3 mb-2"><label class="small">Free Cl</label><input type="number" step="0.01" id="m_ww_fcl" class="form-control"></div>
+                        <div class="col-3 mb-2"><label class="small">Oil&Grease</label><input type="number" step="0.01" id="m_ww_oil" class="form-control"></div>
+                        <div class="col-4 mb-2"><label class="small">Total Coli</label><input type="number" step="0.01" id="m_ww_tcoli" class="form-control"></div>
+                        <div class="col-4 mb-2"><label class="small">Fecal Coli</label><input type="number" step="0.01" id="m_ww_fcoli" class="form-control"></div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer bg-light"><button class="btn btn-primary fw-bold" onclick="saveEditWW()">บันทึกการแก้ไข</button></div>
+        </div>
+    </div>
+</div>
 
 <script>
     // *** URL ของ Google Apps Script ***
@@ -527,7 +979,9 @@
 
     async function fetchAPI(payload) {
         const response = await fetch(API_URL, {
-            method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload)
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
         });
         return await response.json();
     }
@@ -535,24 +989,36 @@
     function init() {
         const currentYear = new Date().getFullYear() + 543;
         let yearOptions = "";
-        for (let i = currentYear; i >= currentYear - 5; i--) yearOptions += `<option value="${i}">${i}</option>`;
+        for (let i = currentYear; i >= currentYear - 5; i--) {
+            yearOptions += `<option value="${i}">${i}</option>`;
+        }
         
         $('.year-sel').html(yearOptions);
         $('.month-sel').html(months.map(m => `<option value="${m}">${m}</option>`).join(''));
-        $('#dashYearFilter').html(yearOptions).val(currentYear);
-        setTimeout(() => { $('#cY2').val(currentYear - 1); $('#cY3').val(currentYear - 2); }, 200);
+        
+        $('#dashYearFilter').html(yearOptions);
+        $('#dashYearFilter').val(currentYear);
+        
+        setTimeout(() => { 
+            $('#cY2').val(currentYear - 1); 
+            $('#cY3').val(currentYear - 2); 
+        }, 200);
     }
     init();
 
     function switchTab(tabId) {
         $('.nav-sidebar a.nav-link-main').removeClass('active');
         $('.nav-sidebar .accordion-body a').removeClass('active');
+        
         $(`#tab-${tabId}`).addClass('active');
-        $('.view-section').hide(); $(`#view-${tabId}`).fadeIn(200);
+        
+        $('.view-section').hide();
+        $(`#view-${tabId}`).fadeIn(200);
         
         if (tabId === 'dashboard') loadDashboard();
         if (tabId === 'report') loadTable('Electricity_Logs');
         
+        // ปิดเมนูบนมือถืออัตโนมัติ
         const offcanvasElement = document.getElementById('sidebarMenu');
         if (offcanvasElement && window.getComputedStyle(offcanvasElement).position === 'fixed') {
              let bsOffcanvas = bootstrap.Offcanvas.getInstance(offcanvasElement);
@@ -560,143 +1026,488 @@
         }
     }
 
+    // --- Authentication ---
     async function login() {
-        const username = $('#user').val(); const password = $('#pass').val();
+        const username = $('#user').val();
+        const password = $('#pass').val();
+        
         if (!username || !password) return alert("กรุณากรอกข้อมูลให้ครบถ้วน");
-        const btn = document.getElementById('btn-login'); btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>รอสักครู่...'; btn.disabled = true;
+        
+        const btn = document.getElementById('btn-login');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>รอสักครู่...';
+        btn.disabled = true;
+        
         try {
             const hashPass = CryptoJS.SHA256(password).toString();
             const data = await fetchAPI({ action: 'login', username: username, passwordHash: hashPass });
+            
             if (data.status === 'success') {
-                currentUser = data.userData.name; userRole = data.userData.role;
-                $('#login-page').hide(); $('#main-app').show(); $('#admin-menu').show(); loadDashboard();
-            } else { alert("❌ " + data.message); }
-        } catch(e) { alert("เชื่อมต่อเซิร์ฟเวอร์ล้มเหลว"); } finally { btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>เข้าสู่ระบบ'; btn.disabled = false; }
+                currentUser = data.userData.name;
+                userRole = data.userData.role;
+                
+                $('#login-page').hide();
+                $('#main-app').show();
+                $('#admin-menu').show(); 
+                
+                loadDashboard();
+            } else {
+                alert("❌ " + data.message);
+            }
+        } catch(e) {
+            alert("เชื่อมต่อเซิร์ฟเวอร์ล้มเหลว กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ต");
+        } finally {
+            btn.innerHTML = '<i class="fas fa-sign-in-alt me-2"></i>เข้าสู่ระบบ';
+            btn.disabled = false;
+        }
     }
 
     function loginGuest() {
-        currentUser = "Guest"; userRole = "Guest";
-        $('#login-page').hide(); $('#main-app').show(); $('#admin-menu').hide(); switchTab('dashboard');
+        currentUser = "Guest";
+        userRole = "Guest";
+        $('#login-page').hide();
+        $('#main-app').show();
+        $('#admin-menu').hide();
+        switchTab('dashboard');
     }
 
     async function register() {
         if (!$('#pdpa').is(':checked')) return alert("กรุณายอมรับเงื่อนไข PDPA ก่อนครับ");
         const u = $('#rU').val(); const n = $('#rN').val(); const e = $('#rE').val(); const p = $('#rP').val();
         if (!u || !n || !e || !p) return alert("กรุณากรอกข้อมูลให้ครบถ้วน");
+        
         try {
-            const data = await fetchAPI({ action: 'register', username: u, name: n, email: e, passwordHash: CryptoJS.SHA256(p).toString() });
-            alert(data.message); if (data.status === "success") bootstrap.Modal.getInstance(document.getElementById('regModal')).hide();
+            const hashPass = CryptoJS.SHA256(p).toString();
+            const data = await fetchAPI({ action: 'register', username: u, name: n, email: e, passwordHash: hashPass });
+            alert(data.message);
+            if (data.status === "success") bootstrap.Modal.getInstance(document.getElementById('regModal')).hide();
         } catch(err) { alert("เชื่อมต่อล้มเหลว"); }
     }
 
     async function forgot() {
-        const email = $('#fE').val(); if (!email) return alert("กรุณากรอกอีเมล");
+        const email = $('#fE').val();
+        if (!email) return alert("กรุณากรอกอีเมล");
         try {
             const data = await fetchAPI({ action: 'forgotPassword', email: email });
-            alert(data.message); if (data.status === "success") bootstrap.Modal.getInstance(document.getElementById('forgotModal')).hide();
+            alert(data.message);
+            if (data.status === "success") bootstrap.Modal.getInstance(document.getElementById('forgotModal')).hide();
         } catch(err) { alert("การส่งอีเมลล้มเหลว"); }
     }
 
-    // ฟังก์ชันช่วยทำ ND (Not Detect)
+    // --- Helper ---
     function toggleND(inputId, cb) {
-        if(cb.checked) { $('#'+inputId).val(0).prop('readonly', true); } 
-        else { $('#'+inputId).prop('readonly', false); }
-    }
-
-    // Auto Calculations
-    function calcE() {
-        const onP = parseFloat($('#eOn').val()) || 0; const offP = parseFloat($('#eOff').val()) || 0; const holP = parseFloat($('#eHol').val()) || 0;
-        if ($('#eOn').val() || $('#eOff').val() || $('#eHol').val()) $('#eTU').val((onP + offP + holP).toFixed(2));
-        $('#eSU').val(((parseFloat($('#eTU').val()) || 0) - (parseFloat($('#eHU').val()) || 0)).toFixed(2));
-        $('#eSP').val(((parseFloat($('#eTP').val()) || 0) - (parseFloat($('#eHP').val()) || 0)).toFixed(2));
-    }
-    function calcModalE() {
-        const onP = parseFloat($('#m_eOn').val()) || 0; const offP = parseFloat($('#m_eOff').val()) || 0; const holP = parseFloat($('#m_eHol').val()) || 0;
-        if ($('#m_eOn').val() || $('#m_eOff').val() || $('#m_eHol').val()) $('#m_eTU').val((onP + offP + holP).toFixed(2));
-        $('#m_eSU').val(((parseFloat($('#m_eTU').val()) || 0) - (parseFloat($('#m_eHU').val()) || 0)).toFixed(2));
-        $('#m_eSP').val(((parseFloat($('#m_eTP').val()) || 0) - (parseFloat($('#m_eHP').val()) || 0)).toFixed(2));
-    }
-    function calcW() {
-        $('#wSU').val(((parseFloat($('#wTU').val()) || 0) - (parseFloat($('#wHU').val()) || 0)).toFixed(2));
-        $('#wSP').val(((parseFloat($('#wTP').val()) || 0) - (parseFloat($('#wHP').val()) || 0)).toFixed(2));
-    }
-    function calcModalW() {
-        $('#m_wSU').val(((parseFloat($('#m_wTU').val()) || 0) - (parseFloat($('#m_wHU').val()) || 0)).toFixed(2));
-        $('#m_wSP').val(((parseFloat($('#m_wTP').val()) || 0) - (parseFloat($('#m_wHP').val()) || 0)).toFixed(2));
-    }
-
-    $('.f-l-val').on('input', function() { let sum=0; $('.f-l-val').each(function(){ sum += parseFloat($(this).val()) || 0; }); $('#f_tot_l').val(sum.toFixed(2)); });
-    $('.f-b-val').on('input', function() { let sum=0; $('.f-b-val').each(function(){ sum += parseFloat($(this).val()) || 0; }); $('#f_tot_b').val(sum.toFixed(2)); });
-    $('.m_f_l').on('input', function() { let sum=0; $('.m_f_l').each(function(){ sum += parseFloat($(this).val()) || 0; }); $('#m_f_tot_l').val(sum.toFixed(2)); });
-    $('.m_f_b').on('input', function() { let sum=0; $('.m_f_b').each(function(){ sum += parseFloat($(this).val()) || 0; }); $('#m_f_tot_b').val(sum.toFixed(2)); });
-
-    $('.r-val').on('input', function() { let sum=0; $('.r-val').each(function(){ sum += parseFloat($(this).val()) || 0; }); $('#rTotal').val(sum.toFixed(2)); });
-    $('.m_r_val').on('input', function() { let sum=0; $('.m_r_val').each(function(){ sum += parseFloat($(this).val()) || 0; }); $('#m_rTot').val(sum.toFixed(2)); });
-
-    // Save Data
-    async function saveData(e, sheet, type) {
-        e.preventDefault();
-        const btn = document.getElementById(`btn-save-${type}`); const originalText = btn.innerHTML;
-        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>กำลังบันทึก...'; btn.disabled = true;
-
-        const fd = new FormData(e.target); const timestamp = new Date().toLocaleString('th-TH');
-        const month = fd.get('month'); const year = fd.get('year'); let rowData = [];
-        
-        if (type === 'elec') rowData = [ timestamp, month, year, $('#eOn').val()||"", $('#eOff').val()||"", $('#eHol').val()||"", $('#eTU').val(), $('#eTP').val(), $('#eHU').val()||"", $('#eHUExtra').val()||"", $('#eHP').val()||"", $('#eSU').val(), $('#eSP').val(), currentUser ];
-        else if (type === 'water') rowData = [ timestamp, month, year, $('#wTU').val(), $('#wTP').val(), $('#wHU').val()||"", $('#wHUExtra').val()||"", $('#wHP').val()||"", $('#wSU').val(), $('#wSP').val(), currentUser ];
-        else if (type === 'fuel') rowData = [ timestamp, month, year, $('#f_dc_l').val()||0, $('#f_dc_b').val()||0, $('#f_dg_l').val()||0, $('#f_dg_b').val()||0, $('#f_do_l').val()||0, $('#f_do_b').val()||0, $('#f_ba_l').val()||0, $('#f_ba_b').val()||0, $('#f_bo_l').val()||0, $('#f_bo_b').val()||0, $('#f_tot_l').val()||0, $('#f_tot_b').val()||0, currentUser ];
-        else if (type === 'general-waste') rowData = [ timestamp, month, year, fd.get('w'), currentUser ];
-        else if (type === 'recycle') rowData = [ timestamp, month, year, fd.get('r1'), fd.get('r2'), fd.get('r3'), fd.get('r4'), fd.get('r5'), fd.get('r6'), fd.get('r7'), fd.get('r8'), fd.get('r9'), fd.get('r10'), fd.get('r11'), $('#rTotal').val(), currentUser ];
-        else if (type === 'infectious') rowData = [ timestamp, month, year, fd.get('w'), currentUser ];
-        else if (type === 'water-quality') rowData = [ timestamp, fd.get('testDate'), $('#wq_tds').val()||"", $('#wq_coli').val()||"", $('#wq_fcoli').val()||"", $('#wq_cond').val()||"", $('#wq_ph').val()||"", currentUser ];
-        else if (type === 'wastewater') rowData = [ timestamp, fd.get('testDate'), $('#ww_bod').val()||"", $('#ww_cod').val()||"", $('#ww_tds').val()||"", $('#ww_ss').val()||"", $('#ww_tkn').val()||"", $('#ww_ph').val()||"", $('#ww_sul').val()||"", $('#ww_fcl').val()||"", $('#ww_oil').val()||"", $('#ww_tcoli').val()||"", $('#ww_fcoli').val()||"", currentUser ];
-
-        try {
-            await fetchAPI({ action: 'saveData', targetSheet: sheet, rowData: rowData });
-            alert("✅ บันทึกข้อมูลสำเร็จ"); e.target.reset();
-            if(month && year) { $(`.month-sel`).val(month); $(`.year-sel`).val(year); }
-        } catch(err) { alert("ส่งคำสั่งแล้ว กรุณาตรวจสอบข้อมูลในระบบ"); } finally { btn.innerHTML = originalText; btn.disabled = false; }
-    }
-
-    // Dashboard
-    async function loadDashboard() {
-        const selectedYear = $('#dashYearFilter').val();
-        const configs = [
-            { id: 'cElec', sheet: 'Electricity_Logs', color: '#ffc107', colIdx: 7 }, { id: 'cWater', sheet: 'Water_Logs', color: '#0dcaf0', colIdx: 4 },
-            { id: 'cFuel', sheet: 'Fuel_Logs', color: '#dc3545', colIdx: 14 }, { id: 'cRecycle', sheet: 'Recycle_Logs', color: '#198754', colIdx: 14 },
-            { id: 'cGenWaste', sheet: 'GeneralWaste_Logs', color: '#6c757d', colIdx: 3 }, { id: 'cInfectious', sheet: 'Infectious_Logs', color: '#dc3545', colIdx: 3 }
-        ];
-
-        for (let conf of configs) {
-            try {
-                const json = await fetchAPI({ action: 'getData', targetSheet: conf.sheet });
-                const rows = json.data.slice(1); let dataArray = new Array(12).fill(0);
-                
-                rows.forEach(row => {
-                    const monthIndex = months.indexOf(String(row[1]).trim());
-                    if (monthIndex !== -1 && String(row[2]).trim() === selectedYear) dataArray[monthIndex] += Number(row[conf.colIdx] || 0);
-                });
-
-                if (charts[conf.id]) charts[conf.id].destroy();
-                charts[conf.id] = new Chart(document.getElementById(conf.id).getContext('2d'), { type: 'line', data: { labels: shortMonths, datasets: [{ data: dataArray, borderColor: conf.color, backgroundColor: conf.color + '33', borderWidth: 2, fill: true, tension: 0.3, pointBackgroundColor: conf.color }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } } });
-            } catch(e) { console.error(`Error loading chart ${conf.id}:`, e); }
+        if(cb.checked) {
+            $('#'+inputId).val(0).prop('readonly', true);
+        } else {
+            $('#'+inputId).prop('readonly', false);
         }
     }
 
-    // Reports & Tables
+    // --- Auto Calculations ---
+    function calcE() {
+        const onP = parseFloat($('#eOn').val()) || 0;
+        const offP = parseFloat($('#eOff').val()) || 0;
+        const holP = parseFloat($('#eHol').val()) || 0;
+        if ($('#eOn').val() || $('#eOff').val() || $('#eHol').val()) $('#eTU').val((onP + offP + holP).toFixed(2));
+        
+        const tU = parseFloat($('#eTU').val()) || 0;
+        const tP = parseFloat($('#eTP').val()) || 0;
+        const hU = parseFloat($('#eHU').val()) || 0;
+        const hP = parseFloat($('#eHP').val()) || 0;
+        
+        $('#eSU').val((tU - hU).toFixed(2));
+        $('#eSP').val((tP - hP).toFixed(2));
+    }
+
+    function calcModalE() {
+        const onP = parseFloat($('#m_eOn').val()) || 0;
+        const offP = parseFloat($('#m_eOff').val()) || 0;
+        const holP = parseFloat($('#m_eHol').val()) || 0;
+        if ($('#m_eOn').val() || $('#m_eOff').val() || $('#m_eHol').val()) $('#m_eTU').val((onP + offP + holP).toFixed(2));
+        
+        const tU = parseFloat($('#m_eTU').val()) || 0;
+        const tP = parseFloat($('#m_eTP').val()) || 0;
+        const hU = parseFloat($('#m_eHU').val()) || 0;
+        const hP = parseFloat($('#m_eHP').val()) || 0;
+        
+        $('#m_eSU').val((tU - hU).toFixed(2));
+        $('#m_eSP').val((tP - hP).toFixed(2));
+    }
+
+    function calcW() {
+        const tU = parseFloat($('#wTU').val()) || 0;
+        const tP = parseFloat($('#wTP').val()) || 0;
+        const hU = parseFloat($('#wHU').val()) || 0;
+        const hP = parseFloat($('#wHP').val()) || 0;
+        
+        $('#wSU').val((tU - hU).toFixed(2));
+        $('#wSP').val((tP - hP).toFixed(2));
+    }
+
+    function calcModalW() {
+        const tU = parseFloat($('#m_wTU').val()) || 0;
+        const tP = parseFloat($('#m_wTP').val()) || 0;
+        const hU = parseFloat($('#m_wHU').val()) || 0;
+        const hP = parseFloat($('#m_wHP').val()) || 0;
+        
+        $('#m_wSU').val((tU - hU).toFixed(2));
+        $('#m_wSP').val((tP - hP).toFixed(2));
+    }
+
+    $('.f-l-val').on('input', function() { let sum = 0; $('.f-l-val').each(function() { sum += parseFloat($(this).val()) || 0; }); $('#f_tot_l').val(sum.toFixed(2)); });
+    $('.f-b-val').on('input', function() { let sum = 0; $('.f-b-val').each(function() { sum += parseFloat($(this).val()) || 0; }); $('#f_tot_b').val(sum.toFixed(2)); });
+    $('.m_f_l').on('input', function() { let sum = 0; $('.m_f_l').each(function() { sum += parseFloat($(this).val()) || 0; }); $('#m_f_tot_l').val(sum.toFixed(2)); });
+    $('.m_f_b').on('input', function() { let sum = 0; $('.m_f_b').each(function() { sum += parseFloat($(this).val()) || 0; }); $('#m_f_tot_b').val(sum.toFixed(2)); });
+    
+    $('.r-val').on('input', function() { let sum = 0; $('.r-val').each(function() { sum += parseFloat($(this).val()) || 0; }); $('#rTotal').val(sum.toFixed(2)); });
+    $('.m_r_val').on('input', function() { let sum = 0; $('.m_r_val').each(function() { sum += parseFloat($(this).val()) || 0; }); $('#m_rTot').val(sum.toFixed(2)); });
+
+    // --- Save Data Function ---
+    async function saveData(e, sheet, type) {
+        e.preventDefault();
+        
+        const btn = document.getElementById(`btn-save-${type}`);
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>กำลังบันทึก...';
+        btn.disabled = true;
+
+        const fd = new FormData(e.target);
+        const timestamp = new Date().toLocaleString('th-TH');
+        
+        // บางฟอร์มไม่มี month/year แต่มี testDate
+        const month = fd.get('month');
+        const year = fd.get('year');
+        const testDate = fd.get('testDate');
+        
+        let rowData = [];
+        
+        if (type === 'elec') {
+            rowData = [ timestamp, month, year, $('#eOn').val()||"", $('#eOff').val()||"", $('#eHol').val()||"", $('#eTU').val(), $('#eTP').val(), $('#eHU').val()||"", $('#eHUExtra').val()||"", $('#eHP').val()||"", $('#eSU').val(), $('#eSP').val(), currentUser ];
+        } else if (type === 'water') {
+            rowData = [ timestamp, month, year, $('#wTU').val(), $('#wTP').val(), $('#wHU').val()||"", $('#wHUExtra').val()||"", $('#wHP').val()||"", $('#wSU').val(), $('#wSP').val(), currentUser ];
+        } else if (type === 'fuel') {
+            rowData = [ timestamp, month, year, $('#f_dc_l').val()||0, $('#f_dc_b').val()||0, $('#f_dg_l').val()||0, $('#f_dg_b').val()||0, $('#f_do_l').val()||0, $('#f_do_b').val()||0, $('#f_ba_l').val()||0, $('#f_ba_b').val()||0, $('#f_bo_l').val()||0, $('#f_bo_b').val()||0, $('#f_tot_l').val()||0, $('#f_tot_b').val()||0, currentUser ];
+        } else if (type === 'general-waste') {
+            rowData = [ timestamp, month, year, fd.get('w'), currentUser ];
+        } else if (type === 'recycle') {
+            rowData = [ timestamp, month, year, fd.get('r1'), fd.get('r2'), fd.get('r3'), fd.get('r4'), fd.get('r5'), fd.get('r6'), fd.get('r7'), fd.get('r8'), fd.get('r9'), fd.get('r10'), fd.get('r11'), $('#rTotal').val(), currentUser ];
+        } else if (type === 'infectious') {
+            rowData = [ timestamp, month, year, fd.get('w'), currentUser ];
+        } else if (type === 'water-quality') {
+            rowData = [ timestamp, testDate, $('#wq_tds').val()||"", $('#wq_coli').val()||"", $('#wq_fcoli').val()||"", $('#wq_cond').val()||"", $('#wq_ph').val()||"", currentUser ];
+        } else if (type === 'wastewater') {
+            rowData = [ timestamp, testDate, $('#ww_bod').val()||"", $('#ww_cod').val()||"", $('#ww_tds').val()||"", $('#ww_ss').val()||"", $('#ww_tkn').val()||"", $('#ww_ph').val()||"", $('#ww_sul').val()||"", $('#ww_fcl').val()||"", $('#ww_oil').val()||"", $('#ww_tcoli').val()||"", $('#ww_fcoli').val()||"", currentUser ];
+        }
+
+        try {
+            await fetchAPI({ action: 'saveData', targetSheet: sheet, rowData: rowData });
+            alert("✅ บันทึกข้อมูลสำเร็จ");
+            
+            e.target.reset();
+            
+            // คืนค่าที่เลือกไว้
+            if(month && year) {
+                $(`.month-sel`).val(month);
+                $(`.year-sel`).val(year);
+            }
+            
+        } catch(err) {
+            alert("ส่งคำสั่งแล้ว กรุณาตรวจสอบข้อมูลในตารางระบบ");
+        } finally {
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    // --- Dashboard Rewrite (Clean 2 Combined Charts + Horizontal Insight Bars) ---
+    async function loadDashboard() {
+        const selectedYear = $('#dashYearFilter').val();
+        
+        // ดึงข้อมูล 8 Sheet พร้อมกันแบบขนาน (เพื่อความรวดเร็ว)
+        try {
+            const [eRes, wRes, fRes, rRes, gRes, iRes, wqRes, wwRes] = await Promise.all([
+                fetchAPI({ action: 'getData', targetSheet: 'Electricity_Logs' }),
+                fetchAPI({ action: 'getData', targetSheet: 'Water_Logs' }),
+                fetchAPI({ action: 'getData', targetSheet: 'Fuel_Logs' }),
+                fetchAPI({ action: 'getData', targetSheet: 'Recycle_Logs' }),
+                fetchAPI({ action: 'getData', targetSheet: 'GeneralWaste_Logs' }),
+                fetchAPI({ action: 'getData', targetSheet: 'Infectious_Logs' }),
+                fetchAPI({ action: 'getData', targetSheet: 'WaterQuality_Logs' }),
+                fetchAPI({ action: 'getData', targetSheet: 'Wastewater_Logs' })
+            ]);
+
+            // 1. กราฟสาธารณูปโภค (ไฟฟ้า, ประปา, น้ำมัน)
+            let eData = new Array(12).fill(0);
+            let wData = new Array(12).fill(0);
+            let fData = new Array(12).fill(0);
+            
+            eRes.data.slice(1).forEach(r => { const m = months.indexOf(String(r[1]).trim()); if(m!==-1 && String(r[2]).trim() === selectedYear) eData[m]+=Number(r[7]||0); }); // Col 7 = เงินรวมไฟ
+            wRes.data.slice(1).forEach(r => { const m = months.indexOf(String(r[1]).trim()); if(m!==-1 && String(r[2]).trim() === selectedYear) wData[m]+=Number(r[4]||0); }); // Col 4 = เงินรวมน้ำ
+            fRes.data.slice(1).forEach(r => { const m = months.indexOf(String(r[1]).trim()); if(m!==-1 && String(r[2]).trim() === selectedYear) fData[m]+=Number(r[14]||0); }); // Col 14 = เงินรวมน้ำมัน
+
+            if(charts['cUtility']) charts['cUtility'].destroy();
+            charts['cUtility'] = new Chart(document.getElementById('cUtility').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: shortMonths,
+                    datasets: [
+                        { label: 'ค่าไฟฟ้า', data: eData, borderColor: '#ffc107', backgroundColor: 'transparent', borderWidth: 3, tension: 0.3 },
+                        { label: 'ค่าน้ำประปา', data: wData, borderColor: '#0dcaf0', backgroundColor: 'transparent', borderWidth: 3, tension: 0.3 },
+                        { label: 'ค่าน้ำมันเชื้อเพลิง', data: fData, borderColor: '#dc3545', backgroundColor: 'transparent', borderWidth: 3, tension: 0.3 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false } }
+            });
+
+            // 2. กราฟปริมาณขยะ (รีไซเคิล, ทั่วไป, ติดเชื้อ)
+            let rData = new Array(12).fill(0);
+            let gData = new Array(12).fill(0);
+            let iData = new Array(12).fill(0);
+
+            rRes.data.slice(1).forEach(r => { const m = months.indexOf(String(r[1]).trim()); if(m!==-1 && String(r[2]).trim() === selectedYear) rData[m]+=Number(r[14]||0); }); // Col 14 = รวมรีไซเคิล
+            gRes.data.slice(1).forEach(r => { const m = months.indexOf(String(r[1]).trim()); if(m!==-1 && String(r[2]).trim() === selectedYear) gData[m]+=Number(r[3]||0); }); // Col 3 = รวมทั่วไป
+            iRes.data.slice(1).forEach(r => { const m = months.indexOf(String(r[1]).trim()); if(m!==-1 && String(r[2]).trim() === selectedYear) iData[m]+=Number(r[3]||0); }); // Col 3 = รวมติดเชื้อ
+
+            if(charts['cWaste']) charts['cWaste'].destroy();
+            charts['cWaste'] = new Chart(document.getElementById('cWaste').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: shortMonths,
+                    datasets: [
+                        { label: 'รีไซเคิล', data: rData, borderColor: '#198754', backgroundColor: 'transparent', borderWidth: 3, tension: 0.3 },
+                        { label: 'ทั่วไป', data: gData, borderColor: '#6c757d', backgroundColor: 'transparent', borderWidth: 3, tension: 0.3 },
+                        { label: 'ติดเชื้อ', data: iData, borderColor: '#fd7e14', backgroundColor: 'transparent', borderWidth: 3, tension: 0.3 }
+                    ]
+                },
+                options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false } }
+            });
+
+            // 3. วิเคราะห์คุณภาพน้ำใช้ (ล่าสุด) -> Horizontal Bar
+            // หารายการล่าสุดจากปีที่เลือก (ดูจากวันที่ตรวจ r[1])
+            let latestWQ = null;
+            let filteredWQ = wqRes.data.slice(1).filter(r => String(r[1]).includes(selectedYear));
+            if(filteredWQ.length > 0) latestWQ = filteredWQ[filteredWQ.length - 1]; // เอาตัวสุดท้าย
+            
+            if(latestWQ) {
+                $('#wq-empty').hide();
+                $('#wq-chart-container').show();
+                
+                // จัดรูปแบบวันที่ให้สวยงาม
+                const dateStr = new Date(latestWQ[1]).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+                $('#dash-wq-date').text(`ตรวจล่าสุด: ${dateStr}`);
+
+                // ดึงค่าและแปลผล
+                const wqParams = ['TDS (<500)', 'Coliforms (<1.1)', 'Fecal (=0)', 'Cond (50-800)', 'pH (6.5-8.5)'];
+                let wqActVals = [Number(latestWQ[2]), Number(latestWQ[3]), Number(latestWQ[4]), Number(latestWQ[5]), Number(latestWQ[6])];
+                let wqColors = [
+                    wqActVals[0] < 500 ? '#198754' : '#dc3545',
+                    wqActVals[1] < 1.1 ? '#198754' : '#dc3545',
+                    wqActVals[2] === 0 ? '#198754' : '#dc3545',
+                    (wqActVals[3] >= 50 && wqActVals[3] <= 800) ? '#198754' : '#dc3545',
+                    (wqActVals[4] >= 6.5 && wqActVals[4] <= 8.5) ? '#198754' : '#dc3545'
+                ];
+                let wqBarVals = [1, 1, 1, 1, 1]; // ความยาวบาร์เท่ากันหมดเพื่อให้ดูเป็น Status
+
+                if(charts['cWaterQuality']) charts['cWaterQuality'].destroy();
+                charts['cWaterQuality'] = new Chart(document.getElementById('cWaterQuality').getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: wqParams, datasets: [{ data: wqBarVals, backgroundColor: wqColors, borderRadius: 5 }] },
+                    options: { 
+                        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return ' วัดค่าได้: ' + wqActVals[ctx.dataIndex]; } } } },
+                        scales: { x: { display: false, max: 1 }, y: { grid: { display: false }, ticks: { font: { family: 'Sarabun', size: 11 } } } }
+                    }
+                });
+            } else {
+                $('#dash-wq-date').text(`ไม่พบประวัติในปีนี้`);
+                $('#wq-chart-container').hide();
+                $('#wq-empty').show();
+            }
+
+            // 4. วิเคราะห์คุณภาพน้ำเสีย (ล่าสุด) -> Horizontal Bar
+            let latestWW = null;
+            let filteredWW = wwRes.data.slice(1).filter(r => String(r[1]).includes(selectedYear));
+            if(filteredWW.length > 0) latestWW = filteredWW[filteredWW.length - 1];
+
+            if(latestWW) {
+                $('#ww-empty').hide();
+                $('#ww-chart-container').show();
+                
+                const dateStr = new Date(latestWW[1]).toLocaleDateString('th-TH', { year: 'numeric', month: 'short', day: 'numeric' });
+                $('#dash-ww-date').text(`ตรวจล่าสุด: ${dateStr}`);
+
+                const wwParams = ['BOD (<=20)', 'COD (<=120)', 'TDS (<=1000)', 'SS (<=30)', 'TKN (<=35)', 'pH (5-9)', 'Sulphide (<=1.0)', 'Free Cl (<=1.0)', 'Oil & Grease (<=20)', 'T. Coli (<=5000)', 'F. Coli (<=1000)'];
+                let wwActVals = [Number(latestWW[2]), Number(latestWW[3]), Number(latestWW[4]), Number(latestWW[5]), Number(latestWW[6]), Number(latestWW[7]), Number(latestWW[8]), Number(latestWW[9]), Number(latestWW[10]), Number(latestWW[11]), Number(latestWW[12])];
+                let wwColors = [
+                    wwActVals[0] <= 20 ? '#198754' : '#dc3545',
+                    wwActVals[1] <= 120 ? '#198754' : '#dc3545',
+                    wwActVals[2] <= 1000 ? '#198754' : '#dc3545',
+                    wwActVals[3] <= 30 ? '#198754' : '#dc3545',
+                    wwActVals[4] <= 35 ? '#198754' : '#dc3545',
+                    (wwActVals[5] >= 5 && wwActVals[5] <= 9) ? '#198754' : '#dc3545',
+                    wwActVals[6] <= 1.0 ? '#198754' : '#dc3545',
+                    wwActVals[7] <= 1.0 ? '#198754' : '#dc3545',
+                    wwActVals[8] <= 20 ? '#198754' : '#dc3545',
+                    wwActVals[9] <= 5000 ? '#198754' : '#dc3545',
+                    wwActVals[10] <= 1000 ? '#198754' : '#dc3545'
+                ];
+                let wwBarVals = Array(11).fill(1);
+
+                if(charts['cWastewater']) charts['cWastewater'].destroy();
+                charts['cWastewater'] = new Chart(document.getElementById('cWastewater').getContext('2d'), {
+                    type: 'bar',
+                    data: { labels: wwParams, datasets: [{ data: wwBarVals, backgroundColor: wwColors, borderRadius: 5 }] },
+                    options: { 
+                        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
+                        plugins: { legend: { display: false }, tooltip: { callbacks: { label: function(ctx) { return ' วัดค่าได้: ' + wwActVals[ctx.dataIndex]; } } } },
+                        scales: { x: { display: false, max: 1 }, y: { grid: { display: false }, ticks: { font: { family: 'Sarabun', size: 10 } } } }
+                    }
+                });
+            } else {
+                $('#dash-ww-date').text(`ไม่พบประวัติในปีนี้`);
+                $('#ww-chart-container').hide();
+                $('#ww-empty').show();
+            }
+
+        } catch(e) {
+            console.error('Error rendering Dashboard:', e);
+        }
+    }
+
+    // --- Compare 3 Years System ---
+    async function genComp() {
+        const type = $('#cType').val();
+        const y1 = $('#cY1').val(); const y2 = $('#cY2').val(); const y3 = $('#cY3').val();
+        
+        const btn = $('#btn-comp');
+        btn.html('<i class="fas fa-spinner fa-spin"></i> ประมวลผล...').prop('disabled', true);
+        
+        try {
+            const json = await fetchAPI({ action: 'getData', targetSheet: type });
+            const rows = json.data.slice(1);
+            
+            let d1 = new Array(12).fill(0); let d2 = new Array(12).fill(0); let d3 = new Array(12).fill(0);
+            let s1 = 0, s2 = 0, s3 = 0;
+            
+            rows.forEach(r => {
+                const m = months.indexOf(String(r[1]).trim());
+                const y = String(r[2]).trim();
+                
+                if (m === -1) return;
+                
+                let v = 0;
+                if (type === 'Electricity_Logs') v = Number(r[7] || 0);
+                else if (type === 'Water_Logs') v = Number(r[4] || 0);
+                else if (type === 'Fuel_Logs') v = Number(r[14] || 0);
+                else if (type === 'GeneralWaste_Logs') v = Number(r[3] || 0);
+                else if (type === 'Recycle_Logs') v = Number(r[14] || 0);
+                else if (type === 'Infectious_Logs') v = Number(r[3] || 0);
+                
+                if (y === y1) { d1[m] += v; s1 += v; }
+                else if (y === y2) { d2[m] += v; s2 += v; }
+                else if (y === y3) { d3[m] += v; s3 += v; }
+            });
+
+            const getInsight = (valNew, valOld, yearNew, yearOld) => {
+                if (valOld === 0) return `ไม่มีข้อมูลฐานของปี ${yearOld}`;
+                const diff = valNew - valOld; const pct = (diff / valOld) * 100;
+                const colorClass = diff > 0 ? 'text-danger' : 'text-success';
+                const icon = diff > 0 ? '<i class="fas fa-arrow-up"></i> เพิ่มขึ้น' : '<i class="fas fa-arrow-down"></i> ลดลง';
+                return `เทียบปี <b>${yearNew}</b> กับ <b>${yearOld}</b>: <span class="${colorClass}">${icon} ${Math.abs(diff).toLocaleString(undefined, {minimumFractionDigits: 2})}</span> คิดเป็น <b>${Math.abs(pct).toFixed(2)}%</b>`;
+            };
+
+            $('#comp-insight').html(`
+                <h5 class="fw-bold mb-3"><i class="fas fa-lightbulb text-warning"></i> บทวิเคราะห์ (Insights)</h5>
+                <ul><li class="mb-2">${getInsight(s2, s1, y2, y1)}</li><li class="mb-2">${getInsight(s3, s2, y3, y2)}</li></ul>
+                <div class="small text-muted mt-3 pt-2 border-top"><b>สรุปยอดรวม:</b> ปี ${y1} = ${s1.toLocaleString()} | ปี ${y2} = ${s2.toLocaleString()} | ปี ${y3} = ${s3.toLocaleString()}</div>
+            `).fadeIn();
+            
+            $('#comp-chart-card').fadeIn();
+            if (charts.comp) charts.comp.destroy();
+            charts.comp = new Chart(document.getElementById('compChart'), {
+                type: 'bar',
+                data: { labels: shortMonths, datasets: [{ label: y1, data: d1, backgroundColor: '#0d6efd' }, { label: y2, data: d2, backgroundColor: '#ffc107' }, { label: y3, data: d3, backgroundColor: '#198754' }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+        } catch(err) {
+            alert("การดึงข้อมูลเพื่อเปรียบเทียบล้มเหลว");
+        } finally {
+            btn.html('<i class="fas fa-search me-2"></i> วิเคราะห์').prop('disabled', false);
+        }
+    }
+
+    // --- TOU Analysis System ---
+    async function genTOU() {
+        const y = $('#touY').val();
+        const btn = $('#btn-tou');
+        btn.html('<i class="fas fa-spinner fa-spin"></i> ประมวลผล...').prop('disabled', true);
+        
+        try {
+            const json = await fetchAPI({ action: 'getData', targetSheet: 'Electricity_Logs' });
+            const rows = json.data.slice(1);
+            let sOn = 0, sOff = 0, sHol = 0;
+            
+            rows.forEach(r => {
+                if (String(r[2]).trim() === String(y)) {
+                    sOn += Number(r[3] || 0); sOff += Number(r[4] || 0); sHol += Number(r[5] || 0);
+                }
+            });
+            
+            const total = sOn + sOff + sHol;
+            $('#tou-result').fadeIn();
+            
+            if (charts.tou) charts.tou.destroy();
+            charts.tou = new Chart(document.getElementById('touPie'), {
+                type: 'doughnut',
+                data: { labels: ['On-Peak', 'Off-Peak', 'Holiday'], datasets: [{ data: [sOn, sOff, sHol], backgroundColor: ['#ffc107', '#6c757d', '#0dcaf0'] }] },
+                options: { responsive: true, maintainAspectRatio: false }
+            });
+
+            let txt = `<h5 class="text-primary mb-3">สรุปพฤติกรรมการใช้ไฟฟ้า ปี ${y}</h5>`;
+            
+            if (total === 0) {
+                txt += `<p class="text-danger">ไม่พบการบันทึกข้อมูล On/Off-Peak ในปีที่เลือก</p>`;
+            } else {
+                const pOn = ((sOn / total) * 100).toFixed(1); const pOff = ((sOff / total) * 100).toFixed(1); const pHol = ((sHol / total) * 100).toFixed(1);
+                txt += `<p><b>ปริมาณไฟฟ้าที่ใช้งานทั้งหมด:</b> ${total.toLocaleString()} หน่วย</p>
+                    <ul>
+                        <li class="mb-2"><span class="text-warning fw-bold">On-Peak:</span> ${sOn.toLocaleString()} หน่วย (${pOn}%)</li>
+                        <li class="mb-2"><span class="text-secondary fw-bold">Off-Peak:</span> ${sOff.toLocaleString()} หน่วย (${pOff}%)</li>
+                        <li class="mb-2"><span class="text-info fw-bold">Holiday:</span> ${sHol.toLocaleString()} หน่วย (${pHol}%)</li>
+                    </ul>
+                    <div class="alert ${pOn > 40 ? 'alert-danger' : 'alert-success'} mt-3 border-0 small">
+                        <b><i class="fas fa-robot"></i> AI Suggestion:</b><br>
+                        สัดส่วน On-Peak อยู่ที่ ${pOn}% ${pOn > 40 ? 'ค่อนข้างสูง แนะนำให้ลดการใช้ไฟหนักในช่วงนี้' : 'อยู่ในเกณฑ์บริหารจัดการพลังงานได้ดี'}
+                    </div>`;
+            }
+            $('#tou-text').html(txt);
+
+        } catch(err) {
+            alert("ดึงข้อมูล TOU ล้มเหลว");
+        } finally {
+            btn.html('<i class="fas fa-search me-2"></i> ประมวลผล').prop('disabled', false);
+        }
+    }
+
+    // --- Data Table System ---
     async function loadTable(sheet) {
-        $('#view-report .btn').removeClass('active'); event.target.classList.add('active');
+        $('#view-report .btn').removeClass('active'); 
+        event.target.classList.add('active');
+        
         $('#mainTable').html('<tr><td class="text-center py-4"><i class="fas fa-spinner fa-spin fa-2x text-primary"></i> กำลังโหลดข้อมูล...</td></tr>');
         
         try {
             const json = await fetchAPI({ action: 'getData', targetSheet: sheet });
             const data = json.data;
-            if ($.fn.DataTable.isDataTable('#mainTable')) $('#mainTable').DataTable().destroy(); $('#mainTable').empty();
+            
+            if ($.fn.DataTable.isDataTable('#mainTable')) $('#mainTable').DataTable().destroy(); 
+            $('#mainTable').empty();
+            
             if (!data || data.length <= 1) return $('#mainTable').html('<tr><td class="text-center py-4 text-muted">ไม่พบข้อมูลในตารางนี้</td></tr>');
 
-            const headers = data[0].slice(0, -1); let columnsConfig = headers.map(h => ({ title: h }));
+            const headers = data[0].slice(0, -1); 
+            let columnsConfig = headers.map(h => ({ title: h }));
             
-            // ให้ทุกตารางกด Edit ได้
             if (userRole !== 'Guest') {
                 columnsConfig.push({ 
                     title: "จัดการ", 
@@ -707,51 +1518,65 @@
                 });
             }
 
-            $('#mainTable').DataTable({ data: data.slice(1), columns: columnsConfig, dom: 'Bfrtip', buttons: ['excel', 'print'], language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' }, order: [[0, 'desc']], scrollX: true });
-        } catch(err) { $('#mainTable').html('<tr><td class="text-center text-danger py-4">เกิดข้อผิดพลาดในการโหลดตาราง</td></tr>'); }
+            $('#mainTable').DataTable({
+                data: data.slice(1), columns: columnsConfig, dom: 'Bfrtip', buttons: ['excel', 'print'],
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.6/i18n/th.json' }, order: [[0, 'desc']], scrollX: true
+            });
+            
+        } catch(err) {
+            $('#mainTable').html('<tr><td class="text-center text-danger py-4">เกิดข้อผิดพลาดในการโหลดตาราง</td></tr>');
+        }
     }
 
     // --- Dynamic Edit System ---
     function openEdit(sheet, encodedRow) {
         const r = JSON.parse(decodeURIComponent(encodedRow));
+        
         if(sheet === 'Electricity_Logs') {
-            $('#m_e_idx').val(r[13]); $('#m_e_ts').val(r[0]); $('#m_e_m').val(r[1]); $('#m_e_y').val(r[2]); 
+            $('#m_e_idx').val(r[14]); $('#m_e_ts').val(r[0]); $('#m_e_m').val(r[1]); $('#m_e_y').val(r[2]); 
+            $('#m_title_text').text(`แก้ไขข้อมูลเดือน ${r[1]} ${r[2]}`);
             $('#m_eOn').val(r[3]); $('#m_eOff').val(r[4]); $('#m_eHol').val(r[5]); $('#m_eTU').val(r[6]); $('#m_eTP').val(r[7]); $('#m_eHU').val(r[8]); $('#m_eHUExtra').val(r[9]); $('#m_eHP').val(r[10]);
             calcModalE(); new bootstrap.Modal(document.getElementById('editElecModal')).show();
         } else if(sheet === 'Water_Logs') {
-            $('#m_w_idx').val(r[10]); $('#m_w_ts').val(r[0]); $('#m_w_m').val(r[1]); $('#m_w_y').val(r[2]); 
+            $('#m_w_idx').val(r[11]); $('#m_w_ts').val(r[0]); $('#m_w_m').val(r[1]); $('#m_w_y').val(r[2]); 
             $('#m_wTU').val(r[3]); $('#m_wTP').val(r[4]); $('#m_wHU').val(r[5]); $('#m_wHUExtra').val(r[6]); $('#m_wHP').val(r[7]);
             calcModalW(); new bootstrap.Modal(document.getElementById('editWaterModal')).show();
         } else if(sheet === 'Fuel_Logs') {
-            $('#m_f_idx').val(r[15]); $('#m_f_ts').val(r[0]); $('#m_f_m').val(r[1]); $('#m_f_y').val(r[2]); 
+            $('#m_f_idx').val(r[16]); $('#m_f_ts').val(r[0]); $('#m_f_m').val(r[1]); $('#m_f_y').val(r[2]); 
             $('#m_f_dc_l').val(r[3]); $('#m_f_dc_b').val(r[4]); $('#m_f_dg_l').val(r[5]); $('#m_f_dg_b').val(r[6]); $('#m_f_do_l').val(r[7]); $('#m_f_do_b').val(r[8]);
             $('#m_f_ba_l').val(r[9]); $('#m_f_ba_b').val(r[10]); $('#m_f_bo_l').val(r[11]); $('#m_f_bo_b').val(r[12]); $('#m_f_tot_l').val(r[13]); $('#m_f_tot_b').val(r[14]);
             new bootstrap.Modal(document.getElementById('editFuelModal')).show();
+        } else if(sheet === 'GeneralWaste_Logs') {
+            $('#m_s_sheet').val(sheet); $('#m_s_idx').val(r[5]); $('#m_s_ts').val(r[0]); $('#m_s_m').val(r[1]); $('#m_s_y').val(r[2]); $('#m_s_w').val(r[3]);
+            $('#m_s_title').text('แก้ไข: ขยะทั่วไป'); new bootstrap.Modal(document.getElementById('editSingleModal')).show();
         } else if(sheet === 'Recycle_Logs') {
-            $('#m_r_idx').val(r[15]); $('#m_r_ts').val(r[0]); $('#m_r_m').val(r[1]); $('#m_r_y').val(r[2]); 
+            $('#m_r_idx').val(r[16]); $('#m_r_ts').val(r[0]); $('#m_r_m').val(r[1]); $('#m_r_y').val(r[2]); 
             $('#m_r1').val(r[3]); $('#m_r2').val(r[4]); $('#m_r3').val(r[5]); $('#m_r4').val(r[6]); $('#m_r5').val(r[7]); $('#m_r6').val(r[8]); $('#m_r7').val(r[9]); $('#m_r8').val(r[10]); $('#m_r9').val(r[11]); $('#m_r10').val(r[12]); $('#m_r11').val(r[13]); $('#m_rTot').val(r[14]);
             new bootstrap.Modal(document.getElementById('editRecycleModal')).show();
-        } else if(sheet === 'GeneralWaste_Logs' || sheet === 'Infectious_Logs') {
-            $('#m_s_sheet').val(sheet); $('#m_s_idx').val(r[4]); $('#m_s_ts').val(r[0]); $('#m_s_m').val(r[1]); $('#m_s_y').val(r[2]); $('#m_s_w').val(r[3]);
-            $('#m_s_title').text(sheet==='GeneralWaste_Logs' ? 'แก้ไข: ขยะทั่วไป' : 'แก้ไข: ขยะติดเชื้อ');
-            new bootstrap.Modal(document.getElementById('editSingleModal')).show();
+        } else if(sheet === 'Infectious_Logs') {
+            $('#m_s_sheet').val(sheet); $('#m_s_idx').val(r[5]); $('#m_s_ts').val(r[0]); $('#m_s_m').val(r[1]); $('#m_s_y').val(r[2]); $('#m_s_w').val(r[3]);
+            $('#m_s_title').text('แก้ไข: ขยะติดเชื้อ'); new bootstrap.Modal(document.getElementById('editSingleModal')).show();
         } else if(sheet === 'WaterQuality_Logs') {
-            $('#m_wq_idx').val(r[7]); $('#m_wq_ts').val(r[0]); $('#m_wq_d').val(r[1]); $('#m_wq_tds').val(r[2]); $('#m_wq_coli').val(r[3]); $('#m_wq_fcoli').val(r[4]); $('#m_wq_cond').val(r[5]); $('#m_wq_ph').val(r[6]);
+            $('#m_wq_idx').val(r[8]); $('#m_wq_ts').val(r[0]); $('#m_wq_d').val(r[1]); $('#m_wq_tds').val(r[2]); $('#m_wq_coli').val(r[3]); $('#m_wq_fcoli').val(r[4]); $('#m_wq_cond').val(r[5]); $('#m_wq_ph').val(r[6]);
             new bootstrap.Modal(document.getElementById('editWQModal')).show();
         } else if(sheet === 'Wastewater_Logs') {
-            $('#m_ww_idx').val(r[13]); $('#m_ww_ts').val(r[0]); $('#m_ww_d').val(r[1]); $('#m_ww_bod').val(r[2]); $('#m_ww_cod').val(r[3]); $('#m_ww_tds').val(r[4]); $('#m_ww_ss').val(r[5]); $('#m_ww_tkn').val(r[6]); $('#m_ww_ph').val(r[7]); $('#m_ww_sul').val(r[8]); $('#m_ww_fcl').val(r[9]); $('#m_ww_oil').val(r[10]); $('#m_ww_tcoli').val(r[11]); $('#m_ww_fcoli').val(r[12]);
+            $('#m_ww_idx').val(r[14]); $('#m_ww_ts').val(r[0]); $('#m_ww_d').val(r[1]); $('#m_ww_bod').val(r[2]); $('#m_ww_cod').val(r[3]); $('#m_ww_tds').val(r[4]); $('#m_ww_ss').val(r[5]); $('#m_ww_tkn').val(r[6]); $('#m_ww_ph').val(r[7]); $('#m_ww_sul').val(r[8]); $('#m_ww_fcl').val(r[9]); $('#m_ww_oil').val(r[10]); $('#m_ww_tcoli').val(r[11]); $('#m_ww_fcoli').val(r[12]);
             new bootstrap.Modal(document.getElementById('editWWModal')).show();
         }
     }
 
     async function sendEdit(sheet, rowData, modalId) {
-        const rowIdx = rowData.pop(); // เอาตัวสุดท้ายออกไปทำเป็น Index
-        rowData.push(currentUser + " (Edit)"); // ใส่ Recorder ต่อท้าย
+        const rowIdx = rowData.pop(); // เอาตัวสุดท้ายออกมาเป็น Index
+        rowData.push(currentUser + " (Edit)"); // เพิ่ม Recorder กลับเข้าไป
         try {
             await fetchAPI({ action: 'editData', targetSheet: sheet, rowIndex: rowIdx, rowData: rowData });
             alert('✅ บันทึกการแก้ไขข้อมูลเรียบร้อยแล้ว');
-            bootstrap.Modal.getInstance(document.getElementById(modalId)).hide(); loadTable(sheet);
-        } catch(err) { alert('บันทึกเรียบร้อย กรุณารีเฟรชหน้าเพื่อดูความเปลี่ยนแปลง'); location.reload(); }
+            bootstrap.Modal.getInstance(document.getElementById(modalId)).hide(); 
+            loadTable(sheet);
+        } catch(err) { 
+            alert('บันทึกเรียบร้อย กรุณารีเฟรชหน้าเพื่อดูความเปลี่ยนแปลง'); 
+            location.reload(); 
+        }
     }
 
     function saveEditElec() { sendEdit('Electricity_Logs', [$('#m_e_ts').val(), $('#m_e_m').val(), $('#m_e_y').val(), $('#m_eOn').val()||"", $('#m_eOff').val()||"", $('#m_eHol').val()||"", $('#m_eTU').val(), $('#m_eTP').val(), $('#m_eHU').val()||"", $('#m_eHUExtra').val()||"", $('#m_eHP').val()||"", $('#m_eSU').val(), $('#m_eSP').val(), $('#m_e_idx').val()], 'editElecModal'); }
@@ -766,4 +1591,3 @@
 
 </body>
 </html>
- 
